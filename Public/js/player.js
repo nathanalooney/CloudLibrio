@@ -44,6 +44,6 @@ var SongList = React.createClass({
 })
 
 ReactDOM.render(
-  <LibraryBox data={inputData}/>,
+  <SongList data={inputData}/>,
   document.getElementById('main')
 );
