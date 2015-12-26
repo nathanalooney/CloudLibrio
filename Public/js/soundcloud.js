@@ -13,11 +13,12 @@
   $(document).ready(function() {
       SC.initialize({
           client_id: '96089e67110795b69a95705f38952d8f',
-          redirect_uri: 'http://sclibrary.testing.com:3000/callback.html'
+          redirect_uri: 'sclibrary.testing.com:3000/callback.html'
       });
 
 
       SC.connect(function() {
+      	  console.log("FUCK");
           SC.get('/me', function(data) {
               $('#main').text(data.username);
           });
