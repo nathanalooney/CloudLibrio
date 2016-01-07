@@ -30,7 +30,7 @@ var SongList = React.createClass({
 
       var songNodes = this.props.data.map(function(song) {
         return (
-          <Song artist={song.artist} title={song.title}>
+          <Song artist={song.user.username} title={song.title}>
           </Song>
         );
       });
@@ -43,7 +43,18 @@ var SongList = React.createClass({
     }
 })
 
-ReactDOM.render(
-  <SongList data={inputData}/>,
-  document.getElementById('main')
-);
+//LNYMSC userid = 29864265
+
+SC.initialize({
+	client_id: '96089e67110795b69a95705f38952d8f',
+	redirect_uri: 'http://sclibrary.testing.com:3000/callback.html',
+});
+
+
+SC.get('/users/29864265/favorites', {limit: 200, offset:200}).then(function(inputData) {
+	ReactDOM.render(
+	  <SongList data={inputData}/>,
+	  document.getElementById('main')
+	);
+});
+
