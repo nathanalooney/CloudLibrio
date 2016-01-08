@@ -69,21 +69,36 @@ var combineLists = function() {
 		library = library.concat(responseList[i])
 	}
 	console.log(library);
+	localStorage["library"] = JSON.stringify(library);
 	ReactDOM.render(
 	  <SongList data={library}/>,
 	  document.getElementById('main')
 	);		
 }
 
-SC.get('/users/29864265/favorites', {limit: 200, linked_partitioning: 1}).then(function(response) {
-		responseList.push(response.collection);
-		buildLibrary(response.next_href);
-		console.log(response);			
-		// ReactDOM.render(
-		//   <SongList data={response.collection}/>,
-		//   document.getElementById('main')
-		// );			
-	});
+//Kick off the site.
+$(document).ready({
+	if (localStorage.getItem("library") == null) {
+		//Basically if it's a new user that hasn't used the site and doesn't have their library saved.
+		SC.get('/users/29864265/favorites', {limit: 200, linked_partitioning: 1}).then(function(response) {
+				responseList.push(response.collection);
+				buildLibrary(response.next_href);
+				console.log(response);			
+				// ReactDOM.render(
+				//   <SongList data={response.collection}/>,
+				//   document.getElementById('main')
+				// );			
+			});	
+	} else {
+		var library = JSON.parse(localStorage["library"]);
+		ReactDOM.render(
+		  <SongList data={library}/>,
+		  document.getElementById('main')
+		);	
+	}	
+})
+
+
 
 
 
