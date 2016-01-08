@@ -45,16 +45,45 @@ var SongList = React.createClass({
 
 //LNYMSC userid = 29864265
 
+var library = []
+var responseList = []
 SC.initialize({
 	client_id: '96089e67110795b69a95705f38952d8f',
 	redirect_uri: 'http://sclibrary.testing.com:3000/callback.html',
 });
 
+var buildLibrary = function(next_href) {
+	console.log("Called");
+	$.get(next_href).then(function(response) {
+		console.log("poop");
+		responseList.push(response.collection);
+		if (response.next_href) {
+			buildLibrary(response.next_href);
+		} 
+		else combineLists();
+	});
+}
 
-SC.get('/users/29864265/favorites', {limit: 200, offset:200}).then(function(inputData) {
+var combineLists = function() {
+	for (var i = 0; i < responseList.length; i++) {
+		library = library.concat(responseList[i])
+	}
+	console.log(library);
 	ReactDOM.render(
-	  <SongList data={inputData}/>,
+	  <SongList data={library}/>,
 	  document.getElementById('main')
-	);
-});
+	);		
+}
+
+SC.get('/users/29864265/favorites', {limit: 200, linked_partitioning: 1}).then(function(response) {
+		responseList.push(response.collection);
+		buildLibrary(response.next_href);
+		console.log(response);			
+		// ReactDOM.render(
+		//   <SongList data={response.collection}/>,
+		//   document.getElementById('main')
+		// );			
+	});
+
+
 
