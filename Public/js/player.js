@@ -64,12 +64,18 @@ var buildLibrary = function(next_href) {
 	});
 }
 
+
+// var compareArtist = function(a, b) {
+
+// }
+
 var combineLists = function() {
 	for (var i = 0; i < responseList.length; i++) {
 		library = library.concat(responseList[i])
 	}
 	console.log(library);
 	localStorage["library"] = JSON.stringify(library);
+	$('#main').empty();
 	ReactDOM.render(
 	  <SongList data={library}/>,
 	  document.getElementById('main')
@@ -101,11 +107,50 @@ var compareForNewTracks = function(response) {
 
 
 }
+
+
+$('#sortTitle').click(function() {
+	library.sort(function(a, b) {
+		if (a.title.replace(/\W/g, '').toLowerCase() < b.title.replace(/\W/g, '').toLowerCase()) {
+			return -1;		
+		}
+		else if (a.title.replace(/\W/g, '').toLowerCase() < b.title.replace(/\W/g, '').toLowerCase()) {
+			return 1;
+		} 
+		else return 0;
+	});
+	console.log(library);
+	console.log(library[0].title);
+	ReactDOM.render(
+	  <SongList data={library}/>,
+	  document.getElementById('main')
+	);	
+});
+
+$('#sortArtist').click(function() {
+	library.sort(function(a, b) {
+		if (a.user.username.replace(/\W/g, '').toLowerCase() < b.user.username.replace(/\W/g, '').toLowerCase()) {
+			return -1;		
+		}
+		else if (a.user.username.replace(/\W/g, '').toLowerCase() < b.user.username.replace(/\W/g, '').toLowerCase()) {
+			return 1;
+		} 
+		else return 0;
+	});
+	console.log(library);
+	console.log(library[0].title);
+	ReactDOM.render(
+	  <SongList data={library}/>,
+	  document.getElementById('main')
+	);	
+});
+
 //Kick off the site.
 $(document).ready(function() {
 		if (localStorage.getItem("library") == null) {
 			//Basically if it's a new user that hasn't used the site and doesn't have their library saved.
 			console.log("Starting library load.");
+			$('#main').html('<p> Loading ... </p>');
 			SC.get('/users/29864265/favorites', {limit: 200, linked_partitioning: 1}).then(function(response) {
 					responseList.push(response.collection);
 					buildLibrary(response.next_href);
