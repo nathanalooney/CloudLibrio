@@ -69,21 +69,64 @@ var combineLists = function() {
 		library = library.concat(responseList[i])
 	}
 	console.log(library);
+	localStorage["library"] = JSON.stringify(library);
 	ReactDOM.render(
 	  <SongList data={library}/>,
 	  document.getElementById('main')
 	);		
 }
 
-SC.get('/users/29864265/favorites', {limit: 200, linked_partitioning: 1}).then(function(response) {
-		responseList.push(response.collection);
-		buildLibrary(response.next_href);
-		console.log(response);			
-		// ReactDOM.render(
-		//   <SongList data={response.collection}/>,
-		//   document.getElementById('main')
-		// );			
-	});
+
+var getMostRecentTracks = function() {
+	console.log("Getting most recent tracks");
+	SC.get('/users/29864265/favorites', {limit: 25, linked_partitioning: 1}).then(function(response) {
+			compareForNewTracks(response);
+		});	
+}
+
+var compareForNewTracks = function(response) {
+	console.log("Comparing newest tracks");
+	console.log(response.collection);
+	var j = 0;
+	// Could fuck shit uuuuupppp so don't run this yet.
+	
+	// for (var i = 0; i < response.collection.length; i++) {
+	// 	if (response.collection[j].id == library[i].id) {
+	// 		console.log("Same");
+	// 	} else {
+	// 		library.unshift(response.collection.shift);
+	// 		j++;
+	// 	}
+	// }
+
+
+}
+//Kick off the site.
+$(document).ready(function() {
+		if (localStorage.getItem("library") == null) {
+			//Basically if it's a new user that hasn't used the site and doesn't have their library saved.
+			console.log("Starting library load.");
+			SC.get('/users/29864265/favorites', {limit: 200, linked_partitioning: 1}).then(function(response) {
+					responseList.push(response.collection);
+					buildLibrary(response.next_href);
+					console.log(response);			
+					// ReactDOM.render(
+					//   <SongList data={response.collection}/>,
+					//   document.getElementById('main')
+					// );			
+				});	
+		} else {
+			console.log("Loading from local storage.");
+			getMostRecentTracks();
+			library = JSON.parse(localStorage["library"]);
+			ReactDOM.render(
+			  <SongList data={library}/>,
+			  document.getElementById('main')
+			);	
+		}	
+	}
+);
+
 
 
 

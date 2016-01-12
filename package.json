@@ -12,5 +12,14 @@
   "dependencies": {
     "body-parser": "^1.14.2",
     "express": "^4.13.3"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nathanalooney/SCLibrary.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nathanalooney/SCLibrary/issues"
+  },
+  "homepage": "https://github.com/nathanalooney/SCLibrary#readme"
 }
