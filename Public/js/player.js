@@ -38,10 +38,12 @@ var SongList = React.createClass({
     }
 })
 
-var library = []
-var responseList = []
+var fullLibrary = [];
+var visibleLibrary = [];
+var responseList = [];
 
 var buildLibrary = function(next_href) {
+	console.log("Building");
 	$.get(next_href).then(function(response) {
 		responseList.push(response.collection);
 		if (response.next_href) {
@@ -52,19 +54,30 @@ var buildLibrary = function(next_href) {
 }
 
 var combineLists = function() {
+	console.log("combiningLists");
 	for (var i = 0; i < responseList.length; i++) {
-		library = library.concat(responseList[i])
+		fullLibrary = fullLibrary.concat(responseList[i])
+		console.log(responseList[i]);
 	}
-	localStorage["library"] = JSON.stringify(library);
+	console.log("Saving library...");
+	localStorage.setItem("fullLibrary", JSON.stringify(fullLibrary));
+	console.log("emptying main..")
 	$('#main').empty();
+	visibleLibrary = fullLibrary;
+	console.log("rendering library..");
+	renderLibrary();	
+}
+
+var renderLibrary = function() {
+	console.log(visibleLibrary.length);
 	ReactDOM.render(
-	  <SongList data={library}/>,
+	  <SongList data={visibleLibrary}/>,
 	  document.getElementById('main')
-	);		
+	);	
 }
 
 $('#sortTitle').click(function() {
-	library.sort(function(a, b) {
+	visibleLibrary.sort(function(a, b) {
 		if (a.title.replace(/\W/g, '').toLowerCase() < b.title.replace(/\W/g, '').toLowerCase()) {
 			return -1;		
 		}
@@ -73,14 +86,11 @@ $('#sortTitle').click(function() {
 		} 
 		else return 0;
 	});
-	ReactDOM.render(
-	  <SongList data={library}/>,
-	  document.getElementById('main')
-	);	
+	renderLibrary();
 });
 
 $('#sortArtist').click(function() {
-	library.sort(function(a, b) {
+	visibleLibrary.sort(function(a, b) {
 		if (a.user.username.replace(/\W/g, '').toLowerCase() < b.user.username.replace(/\W/g, '').toLowerCase()) {
 			return -1;		
 		}
@@ -89,45 +99,36 @@ $('#sortArtist').click(function() {
 		} 
 		else return 0;
 	});
-	ReactDOM.render(
-	  <SongList data={library}/>,
-	  document.getElementById('main')
-	);	
+	renderLibrary();
 });
 
 $("#shuffle").click(function() {
 	console.log("Shuffle");
-	var currentIndex = library.length, temporaryValue, randomIndex;
+	var currentIndex = visibleLibrary.length, temporaryValue, randomIndex;
 
 	while(currentIndex !== 0) {
 		randomIndex = Math.floor(Math.random()*currentIndex);
 		currentIndex -= 1;
 
-		temporaryValue = library[currentIndex];
-		library[currentIndex] = library[randomIndex];
-		library[randomIndex] = temporaryValue;
+		temporaryValue = visibleLibrary[currentIndex];
+		visibleLibrary[currentIndex] = visibleLibrary[randomIndex];
+		visibleLibrary[randomIndex] = temporaryValue;
 	}
-
-	ReactDOM.render(
-	  <SongList data={library}/>,
-	  document.getElementById('main')
-	);	
+	renderLibrary();
 });
 
 $("#remixes").click(function() {
 	console.log("Remixes");
-	var mixLibrary = [];
-	length = library.length;
+	visibleLibrary = [];
+	length = fullLibrary.length;
 	for (var i = 0; i < length; i++) {
-		var title = library[i].title.toLowerCase();
+		var title = fullLibrary[i].title.toLowerCase();
 		if (title.indexOf("remix") > 0 || title.indexOf("edit") > 0 || title.indexOf("mashup") > 0 || title.indexOf("flip") > 0 || title.indexOf("cover") > 0) {
-			mixLibrary.push(library[i]);
+			visibleLibrary.push(fullLibrary[i]);
 		}
 	}
-	ReactDOM.render(
-	  <SongList data={mixLibrary}/>,
-	  document.getElementById('main')
-	);	
+	console.log(visibleLibrary.length)
+	renderLibrary();
 });
 
 //Kick off the site.
@@ -136,21 +137,19 @@ $(document).ready(function() {
 		client_id: '96089e67110795b69a95705f38952d8f',
 		redirect_uri: 'http://sclibrary.testing.com:3000/callback.html',
 	});
-	if (localStorage.getItem("library") == null) {
+	if (localStorage.getItem("fullLibrary") == null) {
+		localStorage.clear();
 		//Basically if it's a new user that hasn't used the site and doesn't have their library saved.
 		console.log("Starting library load.");
 		$('#main').html('<p> Loading ... </p>');
 		SC.get('/users/29864265/favorites', {limit: 200, linked_partitioning: 1}).then(function(response) {
 				responseList.push(response.collection);
-				buildLibrary(response.next_href);
-				console.log(response);	
+				buildLibrary(response.next_href);	
 			});	
 	} else {
 		console.log("Loading from local storage.");
-		library = JSON.parse(localStorage["library"]);
-		ReactDOM.render(
-		  <SongList data={library}/>,
-		  document.getElementById('main')
-		);	
+		fullLibrary = JSON.parse(localStorage["fullLibrary"]);
+		visibleLibrary = fullLibrary;
+		renderLibrary();	
 	}	
 });
