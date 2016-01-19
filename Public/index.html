@@ -15,16 +15,26 @@
 		<!-- <script type="text/javascript" src="/js/async.min.js"></script>-->
 		<!-- WebApp Code -->
 	    <script type="text/babel" src="/js/player.js"></script>
+
+	    <style>
+	    .button {
+	    	display: inline-block;
+	    	margin-left: 10px;
+	    }
+	    </style>
     </head>
   	<body>
   		<div class="row">
   		<div class="col-md-3"></div>
   		<div class="col-md-6">
-	  		<h1> SCLibrary </h1>
-	  		<p id="sortTitle"> Sort Title </p>
-	  		<p id="sortArtist"> Sort Artist </p>
-	  		<p id="shuffle"> Shuffle </p>
-	  		<p id="remixes"> Remixes </p>
+	  		<h1 class="header"> SCLibrary </h1>
+	  		<p id="sortTitle" class="button"> Sort Title </p>
+	  		<p id="sortArtist" class="button"> Sort Artist </p>
+	  		<p id="shuffle" class="button"> Shuffle </p>
+	  		<p id="date" class="button"> Date Added </p>
+			<div class="checkbox">
+			  <label><input type="checkbox" value=""> Remixes </label>
+			</div>
 		    <div id="main"></div>
 		</div>
 		<div class="col-md-3"></div>

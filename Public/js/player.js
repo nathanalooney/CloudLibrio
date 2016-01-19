@@ -9,12 +9,30 @@ var LibraryBox = React.createClass({
   }
 });
 
+var PlayButton = React.createClass({
+	playSong: function() {
+		var id = this.props.id
+		SC.stream("/tracks/"+id).then(function(player) {
+			console.log(player);
+			player.play();
+		});
+	},
+	render: function() {
+		return (
+			<p onClick={this.playSong}>
+				PLAY
+			</p>
+			);
+	}
+});
+
 var Song = React.createClass({
 	render: function() {
 		return (
 			<div>
 				<h3> {this.props.artist} </h3>
 				<p> {this.props.title} </p>
+				<PlayButton id={this.props.id}></PlayButton>
 			</div>
 		);
 	}
@@ -22,10 +40,9 @@ var Song = React.createClass({
 
 var SongList = React.createClass({
     render: function() {
-
       var songNodes = this.props.data.map(function(song) {
         return (
-          <Song artist={song.user.username} title={song.title}>
+          <Song artist={song.user.username} title={song.title} id={song.id}>
           </Song>
         );
       });
@@ -36,14 +53,24 @@ var SongList = React.createClass({
         </div>
       );
     }
-})
+});
+
+
 
 var fullLibrary = [];
 var visibleLibrary = [];
 var responseList = [];
 
+var loadLibrary = function() {
+	$('#main').html('<p> Loading ... </p>');
+	SC.get('/users/29864265/favorites', {limit: 200, linked_partitioning: 1}).then(function(response) {
+			responseList.push(response.collection);
+			buildLibrary(response.next_href);	
+		});		
+}
+
+//Recursive function to sequentially get list of songs in library.
 var buildLibrary = function(next_href) {
-	console.log("Building");
 	$.get(next_href).then(function(response) {
 		responseList.push(response.collection);
 		if (response.next_href) {
@@ -53,23 +80,41 @@ var buildLibrary = function(next_href) {
 	});
 }
 
+//After each batch is loaded, goes through and combines them into one library.
 var combineLists = function() {
-	console.log("combiningLists");
 	for (var i = 0; i < responseList.length; i++) {
 		fullLibrary = fullLibrary.concat(responseList[i])
 		console.log(responseList[i]);
 	}
-	console.log("Saving library...");
 	localStorage.setItem("fullLibrary", JSON.stringify(fullLibrary));
-	console.log("emptying main..")
 	$('#main').empty();
 	visibleLibrary = fullLibrary;
-	console.log("rendering library..");
 	renderLibrary();	
 }
 
+var addNewFavorites = function() {
+	SC.get('/users/29864265/favorites', {limit: 50, linked_partitioning: 1}).then(function(response) {
+		var responseLength = response.collection.length;
+		var recentSongs = [];
+		for (var i = 0; i < 25; i++) {
+			recentSongs.push(fullLibrary[i].title);
+		}
+		for (var i = 0; i < responseLength; i++) {
+			if (recentSongs.indexOf(response.collection[i].title) > -1) {
+				localStorage["fullLibrary"] = JSON.stringify(fullLibrary);
+				visibleLibrary = fullLibrary;
+				renderLibrary();
+				return;
+			} 
+			else {
+				fullLibrary.unshift(response.collection[i]);
+			}
+		}
+	});	
+}
+
 var renderLibrary = function() {
-	console.log(visibleLibrary.length);
+	console.log(visibleLibrary);
 	ReactDOM.render(
 	  <SongList data={visibleLibrary}/>,
 	  document.getElementById('main')
@@ -131,6 +176,12 @@ $("#remixes").click(function() {
 	renderLibrary();
 });
 
+$("#date").click(function() {
+	visibleLibrary = fullLibrary;
+	console.log(visibleLibrary);
+	renderLibrary();
+});
+
 //Kick off the site.
 $(document).ready(function() {
 	SC.initialize({
@@ -141,14 +192,12 @@ $(document).ready(function() {
 		localStorage.clear();
 		//Basically if it's a new user that hasn't used the site and doesn't have their library saved.
 		console.log("Starting library load.");
-		$('#main').html('<p> Loading ... </p>');
-		SC.get('/users/29864265/favorites', {limit: 200, linked_partitioning: 1}).then(function(response) {
-				responseList.push(response.collection);
-				buildLibrary(response.next_href);	
-			});	
+		loadLibrary();
+
 	} else {
 		console.log("Loading from local storage.");
 		fullLibrary = JSON.parse(localStorage["fullLibrary"]);
+		addNewFavorites();
 		visibleLibrary = fullLibrary;
 		renderLibrary();	
 	}	
