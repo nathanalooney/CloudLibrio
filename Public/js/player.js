@@ -13,7 +13,7 @@ var PlayButton = React.createClass({
 	playSong: function() {
 		var id = this.props.id
 		SC.stream("/tracks/"+id).then(function(player) {
-			console.log(player);
+			console.log('play');
 			player.play();
 		});
 	},
@@ -56,10 +56,21 @@ var SongList = React.createClass({
 });
 
 
+var renderLibrary = function() {
+	console.log(visibleLibrary);
+	ReactDOM.render(
+	  <SongList data={visibleLibrary}/>,
+	  document.getElementById('main')
+	);	
+}
+
+//----------------------------------------------------------------------------------------------------//
+
 
 var fullLibrary = [];
 var visibleLibrary = [];
 var responseList = [];
+var searchTimer = null;
 
 var loadLibrary = function() {
 	$('#main').html('<p> Loading ... </p>');
@@ -85,6 +96,9 @@ var combineLists = function() {
 	for (var i = 0; i < responseList.length; i++) {
 		fullLibrary = fullLibrary.concat(responseList[i])
 		console.log(responseList[i]);
+	}
+	for (var i = 0; i < fullLibrary.length; i++) {
+		fullLibrary[i].sclibrary_id = i;
 	}
 	localStorage.setItem("fullLibrary", JSON.stringify(fullLibrary));
 	$('#main').empty();
@@ -113,16 +127,12 @@ var addNewFavorites = function() {
 	});	
 }
 
-var renderLibrary = function() {
-	console.log(visibleLibrary);
-	ReactDOM.render(
-	  <SongList data={visibleLibrary}/>,
-	  document.getElementById('main')
-	);	
-}
-
+//-------------------------------------------------------------------------------------------------------//
 $('#sortTitle').click(function() {
 	visibleLibrary.sort(function(a, b) {
+		if ($('#sortArtist').attr('sort') == 'ascending') {
+			b = [a, a = b][0];
+		} 
 		if (a.title.replace(/\W/g, '').toLowerCase() < b.title.replace(/\W/g, '').toLowerCase()) {
 			return -1;		
 		}
@@ -131,11 +141,19 @@ $('#sortTitle').click(function() {
 		} 
 		else return 0;
 	});
+	if ($('#sortArtist').attr('sort') == 'descending') {
+		$('#sortArtist').attr('sort', 'ascending');
+	} else {
+		$('#sortArtist').attr('sort', 'descending');
+	}
 	renderLibrary();
 });
 
 $('#sortArtist').click(function() {
 	visibleLibrary.sort(function(a, b) {
+		if ($('#sortArtist').attr('sort') == 'ascending') {
+			b = [a, a = b][0];
+		} 
 		if (a.user.username.replace(/\W/g, '').toLowerCase() < b.user.username.replace(/\W/g, '').toLowerCase()) {
 			return -1;		
 		}
@@ -144,8 +162,14 @@ $('#sortArtist').click(function() {
 		} 
 		else return 0;
 	});
+	if ($('#sortArtist').attr('sort') == 'descending') {
+		$('#sortArtist').attr('sort', 'ascending');
+	} else {
+		$('#sortArtist').attr('sort', 'descending');
+	}
 	renderLibrary();
 });
+
 
 $("#shuffle").click(function() {
 	console.log("Shuffle");
@@ -168,26 +192,62 @@ $("#remixes").click(function() {
 	length = fullLibrary.length;
 	for (var i = 0; i < length; i++) {
 		var title = fullLibrary[i].title.toLowerCase();
-		if (title.indexOf("remix") > 0 || title.indexOf("edit") > 0 || title.indexOf("mashup") > 0 || title.indexOf("flip") > 0 || title.indexOf("cover") > 0) {
+		if (title.toLowerCase().indexOf("remix") > -1 ||
+				title.toLowerCase().indexOf("edit") > -1 ||
+				title.toLowerCase().indexOf("mashup") > -1 || 
+				title.toLowerCase().indexOf("flip") > -1 || 
+				title.toLowerCase().indexOf("cover") > -1) {
 			visibleLibrary.push(fullLibrary[i]);
 		}
 	}
-	console.log(visibleLibrary.length)
 	renderLibrary();
 });
 
 $("#date").click(function() {
 	visibleLibrary = fullLibrary;
-	console.log(visibleLibrary);
+	visibleLibrary.sort(function(a, b) {
+		if ($('#sortArtist').attr('sort') == 'ascending') {
+			b = [a, a = b][0];
+		} 
+		if (a.sclibrary_id < b.sclibrary_id) {
+			return -1;		
+		}
+		else if (a.sclibrary_id > b.sclibrary_id) {
+			return 1;
+		} 
+		else return 0;
+	});
+	if ($('#sortArtist').attr('sort') == 'descending') {
+		$('#sortArtist').attr('sort', 'ascending');
+	} else {
+		$('#sortArtist').attr('sort', 'descending');
+	}
 	renderLibrary();
 });
 
-//Kick off the site.
-$(document).ready(function() {
-	SC.initialize({
-		client_id: '96089e67110795b69a95705f38952d8f',
-		redirect_uri: 'http://sclibrary.testing.com:3000/callback.html',
-	});
+
+$('#refresh').click(function() {
+	localStorage.clear();
+	startLibrary();
+});
+
+$('#searchbar').keyup(function() {
+	clearTimeout(searchTimer);
+	searchTimer = setTimeout(function() {
+		var term = $('#searchbar').val();
+		console.log(term);
+		visibleLibrary = [];
+		fullLibrary.forEach(function(song) {
+			if (song.title.toLowerCase().indexOf(term.toLowerCase()) > -1 || song.user.username.toLowerCase().indexOf(term.toLowerCase()) > -1) visibleLibrary.push(song);
+		});
+		renderLibrary();
+	}, 250);
+
+});
+
+//-------------------------------------------------------------------------------------------------------------//
+
+var startLibrary = function() {
 	if (localStorage.getItem("fullLibrary") == null) {
 		localStorage.clear();
 		//Basically if it's a new user that hasn't used the site and doesn't have their library saved.
@@ -201,4 +261,12 @@ $(document).ready(function() {
 		visibleLibrary = fullLibrary;
 		renderLibrary();	
 	}	
+}
+//Kick off the site.
+$(document).ready(function() {
+	SC.initialize({
+		client_id: '96089e67110795b69a95705f38952d8f',
+		redirect_uri: 'http://sclibrary.testing.com:3000/callback.html',
+	});
+	startLibrary();
 });

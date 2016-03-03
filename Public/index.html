@@ -17,27 +17,60 @@
 	    <script type="text/babel" src="/js/player.js"></script>
 
 	    <style>
-	    .button {
+/*	    .button {
 	    	display: inline-block;
 	    	margin-left: 10px;
+	    }
+	    body {
+	    	background-color: #03A9F4;
+	    }
+	    .col-md-10 {
+	    	background-color: #ffffff;
+	    	box-shadow: 0px 0px 2px 2px #888888;
+	    }*/
+	    #header-container {
+	    	background-color: #03A9F4;
+	    	box-shadow: 0px 0px 1px 1px #888888;
 	    }
 	    </style>
     </head>
   	<body>
-  		<div class="row">
-  		<div class="col-md-3"></div>
-  		<div class="col-md-6">
-	  		<h1 class="header"> SCLibrary </h1>
-	  		<p id="sortTitle" class="button"> Sort Title </p>
-	  		<p id="sortArtist" class="button"> Sort Artist </p>
-	  		<p id="shuffle" class="button"> Shuffle </p>
-	  		<p id="date" class="button"> Date Added </p>
-			<div class="checkbox">
-			  <label><input type="checkbox" value=""> Remixes </label>
+  		<div id="header-container">
+	  		<div class="row">
+		  		<div class="col-md-1"></div>
+		  		<div class="col-md-10">
+			  		<h1 class="header" style="text-align: center;"> SCLibrary </h1>
+				</div>
+				<div class="col-md-1"></div>
 			</div>
-		    <div id="main"></div>
+	  		<div class="row">
+		  		<div class="col-md-1"></div>
+		  		<div class="col-md-10" style="text-align: center;">
+			  		<p id="sortTitle" class="sort-button" sort="descending" style="display: inline; padding: 10px;"> Sort Title </p>
+			  		<p id="sortArtist" class="sort-button" sort="descending" style="display: inline; padding: 10px;"> Sort Artist </p>
+			  		<p id="shuffle" class="sort-button" sort="descending" style="display: inline; padding: 10px;"> Shuffle </p>
+			  		<p id="date" class="sort-button" sort="descending" style="display: inline; padding: 10px;"> Date Added </p>
+				  	<p id="remixes" class="sort-button" sort="descending" style="display: inline; padding: 10px;"> Remixes </p>			  		
+			  		<p id="refresh" class="sort-button" sort="descending" style="display: inline; padding: 10px;"> Refresh </p>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
+	  		<div class="row">
+		  		<div class="col-md-1"></div>
+		  		<div class="col-md-10">
+		  			<div class="form-group">
+		  				<input type="search" class="form-control" id="searchbar" placeholder="Search...">
+		  			</div>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
 		</div>
-		<div class="col-md-3"></div>
+		<div class="row">
+	  		<div class="col-md-1"></div>
+	  		<div class="col-md-10">
+	  			<div id="main"></div>
+			</div>
+			<div class="col-md-1"></div>
 		</div>
   	</body>
 </html>
