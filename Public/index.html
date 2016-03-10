@@ -11,10 +11,8 @@
 		<script src="https://connect.soundcloud.com/sdk/sdk-3.0.0.js"></script>
 		<!-- Bootstrap -->
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-		<!-- Async -->
-		<!-- <script type="text/javascript" src="/js/async.min.js"></script>-->
 		<!-- WebApp Code -->
-	    <script type="text/babel" src="/js/player.js"></script>
+
 
 	    <style>
 /*	    .button {
@@ -31,6 +29,17 @@
 	    #header-container {
 	    	background-color: #03A9F4;
 	    	box-shadow: 0px 0px 1px 1px #888888;
+	    }
+	    #player{
+	    	position: fixed;
+	    	background-color: #03A9F4;
+	    	left: 0px;
+	    	bottom: 0px;
+	    	width: 100%;
+	    }
+	    #main {
+	    	background-color: #ffffff;
+	    	height: 100%;
 	    }
 	    </style>
     </head>
@@ -72,5 +81,11 @@
 			</div>
 			<div class="col-md-1"></div>
 		</div>
+		<div class="row">
+	  		<div class="col-md-12" id="player"> </div>
+		</div>
   	</body>
+
+	<script src="/js/player.js"></script>
+
 </html>
