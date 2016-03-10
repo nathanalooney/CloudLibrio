@@ -66,7 +66,8 @@ var renderLibrary = function(libraryToRender) {
 	//   document.getElementById('main')
 	// );
 	$('#main').empty();
-	libraryToRender.forEach(function(song) {
+	var filteredLibrary = filterLibrary(libraryToRender);
+	filteredLibrary.forEach(function(song) {
 		var container = document.createElement('div');
 		$(container).attr('song_id', song.id);
 		var title = document.createElement('p');
@@ -94,6 +95,26 @@ var renderLibrary = function(libraryToRender) {
 	});
 }
 
+var filterLibrary = function(library) {
+	var returnLibrary = [];
+	library.forEach(function(song) {
+		var isRemix = false;
+		var title = song.title.toLowerCase();
+		if (title.indexOf("remix") > -1 ||
+				title.indexOf("edit") > -1 ||
+				title.indexOf("mashup") > -1 || 
+				title.indexOf("flip") > -1 || 
+				title.indexOf("cover") > -1 ||
+				title.indexOf("bootleg") > -1 ||
+				title.indexOf('redo') > -1) {
+			isRemix = true;
+		} 		
+		if ($('#remixes').is(':checked') && isRemix == true) returnLibrary.push(song);
+		if ($('#originals').is(':checked') && isRemix == false) returnLibrary.push(song); 
+	});
+	return returnLibrary;
+}
+
 //----------------------------------------------------------------------------------------------------//
 
 
@@ -103,11 +124,12 @@ var responseList = [];
 var searchTimer = null;
 var currentSong = null;
 
+
+
 var loadLibrary = function() {
 	var client_id = 'client_id=96089e67110795b69a95705f38952d8f'
 	$('#main').html('<p> Loading ... </p>');
 	$.get('http://api.soundcloud.com/users/29864265/favorites?'+client_id+'&limit=200&linked_partitioning=1', function(response) {
-			console.log(response.collection);
 			responseList.push(response.collection);
 			buildLibrary(response.next_href);	
 		});		
@@ -121,21 +143,29 @@ var buildLibrary = function(next_href) {
 		if (response.next_href) {
 			buildLibrary(response.next_href);
 		} 
-		else combineLists();
+		else {
+			console.log('Done');
+			combineLists();
+		} 
 	});
 }
 
 //After each batch is loaded, goes through and combines them into one library.
 var combineLists = function() {
+	console.log('Called combineLists...')
+	fullLibrary = [];
 	for (var i = 0; i < responseList.length; i++) {
 		fullLibrary = fullLibrary.concat(responseList[i])
 	}
 	for (var i = 0; i < fullLibrary.length; i++) {
 		fullLibrary[i].sclibrary_id = i;
 	}
+	console.log('Setting localstorage..');
+	console.log(fullLibrary);
 	localStorage.setItem("fullLibrary", JSON.stringify(fullLibrary));
 	$('#main').empty();
 	visibleLibrary = fullLibrary;
+	console.log('Calling render...')
 	renderLibrary(visibleLibrary);	
 }
 
@@ -148,7 +178,7 @@ var addNewFavorites = function() {
 		}
 		for (var i = 0; i < responseLength; i++) {
 			if (recentSongs.indexOf(response.collection[i].title) > -1) {
-				localStorage["fullLibrary"] = JSON.stringify(fullLibrary);
+				localStorage.setItem("fullLibrary", JSON.stringify(fullLibrary));
 				visibleLibrary = fullLibrary;
 				renderLibrary(visibleLibrary);
 				return;
@@ -219,20 +249,12 @@ $("#shuffle").click(function() {
 	renderLibrary(visibleLibrary);
 });
 
-$("#remixes").click(function() {
-	console.log("Remixes");
-	visibleLibrary = [];
-	length = fullLibrary.length;
-	for (var i = 0; i < length; i++) {
-		var title = fullLibrary[i].title.toLowerCase();
-		if (title.toLowerCase().indexOf("remix") > -1 ||
-				title.toLowerCase().indexOf("edit") > -1 ||
-				title.toLowerCase().indexOf("mashup") > -1 || 
-				title.toLowerCase().indexOf("flip") > -1 || 
-				title.toLowerCase().indexOf("cover") > -1) {
-			visibleLibrary.push(fullLibrary[i]);
-		}
-	}
+$("#remixes").change(function() {
+	renderLibrary(visibleLibrary);
+});
+
+$("#originals").change(function() {
+	console.log("Click")
 	renderLibrary(visibleLibrary);
 });
 
@@ -260,9 +282,10 @@ $("#date").click(function() {
 
 
 $('#refresh').click(function() {
-	localStorage.clear();
-	startLibrary();
+	loadLibrary();
 });
+
+
 
 $('#searchbar').keyup(function() {
 	clearTimeout(searchTimer);
@@ -275,32 +298,27 @@ $('#searchbar').keyup(function() {
 		});
 		renderLibrary(visibleLibrary);
 	}, 250);
-
 });
 
 //-------------------------------------------------------------------------------------------------------------//
 
 var startLibrary = function() {
 	if (localStorage.getItem("fullLibrary") == null) {
-		localStorage.clear();
 		//Basically if it's a new user that hasn't used the site and doesn't have their library saved.
 		console.log("Starting library load.");
 		loadLibrary();
 
 	} else {
 		console.log("Loading from local storage.");
-		fullLibrary = JSON.parse(localStorage["fullLibrary"]);
-		addNewFavorites();
+		fullLibrary = JSON.parse(localStorage.getItem("fullLibrary"));
+		//addNewFavorites();
 		visibleLibrary = fullLibrary;
 		renderLibrary(visibleLibrary);	
 	}	
 }
 
-
 // client_id: '96089e67110795b69a95705f38952d8f'
 // redirect_uri: 'http://sclibrary.testing.com:3000/callback.html'
-
-
 
 //Kick off the site.
 $(document).ready(function() {
