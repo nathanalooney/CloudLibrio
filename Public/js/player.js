@@ -1,3 +1,6 @@
+(function() {
+
+
 // var LibraryBox = React.createClass({
 //   render: function() {
 //     return (
@@ -60,14 +63,17 @@
 
 
 
-var renderLibrary = function(libraryToRender) {
+var renderLibrary = function(displayList, filterOnly) {
 	// ReactDOM.render(
-	//   <SongList data={visibleLibrary}/>,
+	//   <SongList data={fullLibrary}/>,
 	//   document.getElementById('main')
 	// );
 	$('#main').empty();
-	var filteredLibrary = filterLibrary(libraryToRender);
-	filteredLibrary.forEach(function(song) {
+	if (!filterOnly) displayList = sortLibrary(displayList);	
+	sortedFullLibrary = displayList;
+	displayList = filterLibrary(displayList);
+
+	displayList.forEach(function(song) {
 		var container = document.createElement('div');
 		$(container).attr('song_id', song.id);
 		var title = document.createElement('p');
@@ -75,10 +81,6 @@ var renderLibrary = function(libraryToRender) {
 		var play = document.createElement('p');
 		$(play).text('Play');
 		$(play).click(function() {
-			// $.get(song.stream_url+'?client_id=96089e67110795b69a95705f38952d8f', function(response) {
-
-			// });
-
 			if (currentSong) currentSong.pause();
 			currentSong = new Audio(song.stream_url+'?client_id=96089e67110795b69a95705f38952d8f');
 			currentSong.play();
@@ -93,6 +95,7 @@ var renderLibrary = function(libraryToRender) {
 
 		$('#main').append(container);
 	});
+
 }
 
 var filterLibrary = function(library) {
@@ -115,16 +118,84 @@ var filterLibrary = function(library) {
 	return returnLibrary;
 }
 
+var sortLibrary = function(library) {
+	switch(librarySort) {
+		case 0:
+			library.sort(sortTitle);
+			break;
+		case 1:
+			library.sort(sortArtist);
+			break;
+		case 2:
+			library.sort(sortDate);
+			break;
+		case 3:
+			library = shuffle(library);
+			break;
+	}
+	return library;
+}
+
+var sortTitle = function(a, b) {
+	if ($('#sortTitle').attr('sort') == 'ascending') {
+		b = [a, a = b][0];
+	} 
+	if (a.title.replace(/\W/g, '').toLowerCase() < b.title.replace(/\W/g, '').toLowerCase()) {
+		return -1;		
+	}
+	else if (a.title.replace(/\W/g, '').toLowerCase() > b.title.replace(/\W/g, '').toLowerCase()) {
+		return 1;
+	} 
+	else return 0;
+}
+
+var sortArtist = function(a, b) {
+	if ($('#sortArtist').attr('sort') == 'ascending') {
+		b = [a, a = b][0];
+	} 
+	if (a.user.username.replace(/\W/g, '').toLowerCase() < b.user.username.replace(/\W/g, '').toLowerCase()) {
+		return -1;		
+	}
+	else if (a.user.username.replace(/\W/g, '').toLowerCase() > b.user.username.replace(/\W/g, '').toLowerCase()) {
+		return 1;
+	} 
+	else return 0;
+}
+
+var sortDate = function(a, b) {
+		if ($('#sortDate').attr('sort') == 'descending') {
+			b = [a, a = b][0];
+		} 
+		if (a.sclibrary_id < b.sclibrary_id) {
+			return -1;		
+		}
+		else if (a.sclibrary_id > b.sclibrary_id) {
+			return 1;
+		} 
+		else return 0;
+	}
+
+var shuffle = function(library) {
+	var currentIndex = library.length, temporaryValue, randomIndex;
+	while(currentIndex !== 0) {
+		randomIndex = Math.floor(Math.random()*currentIndex);
+		currentIndex -= 1;
+
+		temporaryValue = library[currentIndex];
+		library[currentIndex] = library[randomIndex];
+		library[randomIndex] = temporaryValue;
+	}
+	return library;
+}
 //----------------------------------------------------------------------------------------------------//
 
 
 var fullLibrary = [];
-var visibleLibrary = [];
+var sortedFullLibrary = [];
 var responseList = [];
 var searchTimer = null;
 var currentSong = null;
-
-
+var librarySort = null;
 
 var loadLibrary = function() {
 	var client_id = 'client_id=96089e67110795b69a95705f38952d8f'
@@ -164,9 +235,9 @@ var combineLists = function() {
 	console.log(fullLibrary);
 	localStorage.setItem("fullLibrary", JSON.stringify(fullLibrary));
 	$('#main').empty();
-	visibleLibrary = fullLibrary;
+	fullLibrary = fullLibrary;
 	console.log('Calling render...')
-	renderLibrary(visibleLibrary);	
+	renderLibrary(fullLibrary);	
 }
 
 var addNewFavorites = function() {
@@ -179,8 +250,8 @@ var addNewFavorites = function() {
 		for (var i = 0; i < responseLength; i++) {
 			if (recentSongs.indexOf(response.collection[i].title) > -1) {
 				localStorage.setItem("fullLibrary", JSON.stringify(fullLibrary));
-				visibleLibrary = fullLibrary;
-				renderLibrary(visibleLibrary);
+				fullLibrary = fullLibrary;
+				renderLibrary(fullLibrary);
 				return;
 			} 
 			else {
@@ -191,112 +262,58 @@ var addNewFavorites = function() {
 }
 
 //-------------------------------------------------------------------------------------------------------//
-$('#sortTitle').click(function() {
-	visibleLibrary.sort(function(a, b) {
-		if ($('#sortArtist').attr('sort') == 'ascending') {
-			b = [a, a = b][0];
-		} 
-		if (a.title.replace(/\W/g, '').toLowerCase() < b.title.replace(/\W/g, '').toLowerCase()) {
-			return -1;		
-		}
-		else if (a.title.replace(/\W/g, '').toLowerCase() > b.title.replace(/\W/g, '').toLowerCase()) {
-			return 1;
-		} 
-		else return 0;
-	});
-	if ($('#sortArtist').attr('sort') == 'descending') {
-		$('#sortArtist').attr('sort', 'ascending');
+var toggle = function(button) {
+	if ($('#sort'+button).attr('sort') == 'descending') {
+		$('#sort'+button).attr('sort', 'ascending');
 	} else {
-		$('#sortArtist').attr('sort', 'descending');
-	}
-	renderLibrary(visibleLibrary);
+		$('#sort'+button).attr('sort', 'descending');
+	}	
+}
+
+$('#sortTitle').click(function() {
+	toggle('Title');
+	librarySort = 0;
+	renderLibrary(fullLibrary);
 });
 
 $('#sortArtist').click(function() {
-	visibleLibrary.sort(function(a, b) {
-		if ($('#sortArtist').attr('sort') == 'ascending') {
-			b = [a, a = b][0];
-		} 
-		if (a.user.username.replace(/\W/g, '').toLowerCase() < b.user.username.replace(/\W/g, '').toLowerCase()) {
-			return -1;		
-		}
-		else if (a.user.username.replace(/\W/g, '').toLowerCase() > b.user.username.replace(/\W/g, '').toLowerCase()) {
-			return 1;
-		} 
-		else return 0;
-	});
-	if ($('#sortArtist').attr('sort') == 'descending') {
-		$('#sortArtist').attr('sort', 'ascending');
-	} else {
-		$('#sortArtist').attr('sort', 'descending');
-	}
-	renderLibrary(visibleLibrary);
+	toggle('Artist');
+	librarySort = 1;
+	renderLibrary(fullLibrary);
 });
 
+$("#sortDate").click(function() {
+	toggle('Date');
+	librarySort = 2;
+	renderLibrary(fullLibrary);
+});
 
 $("#shuffle").click(function() {
-	console.log("Shuffle");
-	var currentIndex = visibleLibrary.length, temporaryValue, randomIndex;
-
-	while(currentIndex !== 0) {
-		randomIndex = Math.floor(Math.random()*currentIndex);
-		currentIndex -= 1;
-
-		temporaryValue = visibleLibrary[currentIndex];
-		visibleLibrary[currentIndex] = visibleLibrary[randomIndex];
-		visibleLibrary[randomIndex] = temporaryValue;
-	}
-	renderLibrary(visibleLibrary);
+	librarySort = 3;
+	renderLibrary(fullLibrary);
 });
 
 $("#remixes").change(function() {
-	renderLibrary(visibleLibrary);
+	renderLibrary(sortedFullLibrary, true);
 });
 
 $("#originals").change(function() {
-	console.log("Click")
-	renderLibrary(visibleLibrary);
+	renderLibrary(sortedFullLibrary, true);
 });
-
-$("#date").click(function() {
-	visibleLibrary = fullLibrary;
-	visibleLibrary.sort(function(a, b) {
-		if ($('#sortArtist').attr('sort') == 'ascending') {
-			b = [a, a = b][0];
-		} 
-		if (a.sclibrary_id < b.sclibrary_id) {
-			return -1;		
-		}
-		else if (a.sclibrary_id > b.sclibrary_id) {
-			return 1;
-		} 
-		else return 0;
-	});
-	if ($('#sortArtist').attr('sort') == 'descending') {
-		$('#sortArtist').attr('sort', 'ascending');
-	} else {
-		$('#sortArtist').attr('sort', 'descending');
-	}
-	renderLibrary(visibleLibrary);
-});
-
 
 $('#refresh').click(function() {
 	loadLibrary();
 });
 
-
-
 $('#searchbar').keyup(function() {
 	clearTimeout(searchTimer);
 	searchTimer = setTimeout(function() {
 		var term = $('#searchbar').val();
-		console.log(term);
-		visibleLibrary = [];
+		var searchLibrary = []
 		fullLibrary.forEach(function(song) {
-			if (song.title.toLowerCase().indexOf(term.toLowerCase()) > -1 || song.user.username.toLowerCase().indexOf(term.toLowerCase()) > -1) visibleLibrary.push(song);
+			if (song.title.toLowerCase().indexOf(term.toLowerCase()) > -1 || song.user.username.toLowerCase().indexOf(term.toLowerCase()) > -1) searchLibrary.push(song);
 		});
-		renderLibrary(visibleLibrary);
+		renderLibrary(searchLibrary, true);
 	}, 250);
 });
 
@@ -312,8 +329,8 @@ var startLibrary = function() {
 		console.log("Loading from local storage.");
 		fullLibrary = JSON.parse(localStorage.getItem("fullLibrary"));
 		//addNewFavorites();
-		visibleLibrary = fullLibrary;
-		renderLibrary(visibleLibrary);	
+		fullLibrary = fullLibrary;
+		renderLibrary(fullLibrary);	
 	}	
 }
 
@@ -325,3 +342,11 @@ $(document).ready(function() {
 
 	startLibrary();
 });
+
+
+})();
+
+
+
+
+
