@@ -75,12 +75,13 @@ var renderLibrary = function(displayList, filterOnly) {
 
 	displayList.forEach(function(song) {
 		var container = document.createElement('div');
-		$(container).attr('song_id', song.id);
+		$(container).attr('song_id', song.id).addClass('song-container');
 		var title = document.createElement('p');
-		var artist = document.createElement('h1');
-		var play = document.createElement('p');
-		$(play).text('Play');
-		$(play).click(function() {
+		$(title).addClass('song-title');
+		var artist = document.createElement('h3');
+		$(artist).addClass('song-artist')
+		var play = $('<span class="glyphicon glyphicon-play-circle" aria-hidden="true" style="font-size: 4em;"></span>')
+		play.click(function() {
 			if (currentSong) currentSong.pause();
 			currentSong = new Audio(song.stream_url+'?client_id=96089e67110795b69a95705f38952d8f');
 			currentSong.play();
@@ -89,9 +90,12 @@ var renderLibrary = function(displayList, filterOnly) {
 		});
 		$(artist).text(song.user.username);
 		$(title).text(song.title);
+		$(container).append(play);		
 		$(container).append(artist);
 		$(container).append(title);
-		$(container).append(play);
+		$(container).append($('<p> Favorites: '+song.favoritings_count+' </p>').addClass('song-favorites'));
+		$(container).append($('<p> Plays: '+song.playback_count+'</p>').addClass('song-plays'));
+
 
 		$('#main').append(container);
 	});
@@ -130,6 +134,12 @@ var sortLibrary = function(library) {
 			library.sort(sortDate);
 			break;
 		case 3:
+			library.sort(sortFavorites);
+			break;
+		case 4:
+			library.sort(sortPlays);
+			break;
+		case 5:
 			library = shuffle(library);
 			break;
 	}
@@ -137,7 +147,7 @@ var sortLibrary = function(library) {
 }
 
 var sortTitle = function(a, b) {
-	if ($('#sortTitle').attr('sort') == 'ascending') {
+	if ($('#sort-title').attr('sort') == 'ascending') {
 		b = [a, a = b][0];
 	} 
 	if (a.title.replace(/\W/g, '').toLowerCase() < b.title.replace(/\W/g, '').toLowerCase()) {
@@ -150,7 +160,7 @@ var sortTitle = function(a, b) {
 }
 
 var sortArtist = function(a, b) {
-	if ($('#sortArtist').attr('sort') == 'ascending') {
+	if ($('#sort-artist').attr('sort') == 'ascending') {
 		b = [a, a = b][0];
 	} 
 	if (a.user.username.replace(/\W/g, '').toLowerCase() < b.user.username.replace(/\W/g, '').toLowerCase()) {
@@ -163,7 +173,7 @@ var sortArtist = function(a, b) {
 }
 
 var sortDate = function(a, b) {
-		if ($('#sortDate').attr('sort') == 'descending') {
+		if ($('#sort-date').attr('sort') == 'descending') {
 			b = [a, a = b][0];
 		} 
 		if (a.sclibrary_id < b.sclibrary_id) {
@@ -174,6 +184,32 @@ var sortDate = function(a, b) {
 		} 
 		else return 0;
 	}
+
+var sortFavorites = function(a, b) {
+	if ($('#sort-favorites').attr('sort') == 'ascending') {
+		b = [a, a = b][0];
+	} 
+	if (parseInt(a.favoritings_count) < parseInt(b.favoritings_count)) {
+		return -1;		
+	}
+	else if (parseInt(a.favoritings_count) > parseInt(b.favoritings_count)) {
+		return 1;
+	} 
+	else return 0;
+}
+
+var sortPlays = function(a, b) {
+	if ($('#sort-plays').attr('sort') == 'ascending') {
+		b = [a, a = b][0];
+	} 
+	if (parseInt(a.playback_count) < parseInt(b.playback_count)) {
+		return -1;		
+	}
+	else if (parseInt(a.playback_count) > parseInt(b.playback_count)) {
+		return 1;
+	} 
+	else return 0;
+}
 
 var shuffle = function(library) {
 	var currentIndex = library.length, temporaryValue, randomIndex;
@@ -240,56 +276,81 @@ var combineLists = function() {
 	renderLibrary(fullLibrary);	
 }
 
-var addNewFavorites = function() {
-	SC.get('/users/29864265/favorites', {limit: 50, linked_partitioning: 1}).then(function(response) {
-		var responseLength = response.collection.length;
-		var recentSongs = [];
-		for (var i = 0; i < 25; i++) {
-			recentSongs.push(fullLibrary[i].title);
-		}
-		for (var i = 0; i < responseLength; i++) {
-			if (recentSongs.indexOf(response.collection[i].title) > -1) {
-				localStorage.setItem("fullLibrary", JSON.stringify(fullLibrary));
-				fullLibrary = fullLibrary;
-				renderLibrary(fullLibrary);
-				return;
-			} 
-			else {
-				fullLibrary.unshift(response.collection[i]);
-			}
-		}
-	});	
+// var addNewFavorites = function() {
+// 	SC.get('/users/29864265/favorites', {limit: 50, linked_partitioning: 1}).then(function(response) {
+// 		var responseLength = response.collection.length;
+// 		var recentSongs = [];
+// 		for (var i = 0; i < 25; i++) {
+// 			recentSongs.push(fullLibrary[i].title);
+// 		}
+// 		for (var i = 0; i < responseLength; i++) {
+// 			if (recentSongs.indexOf(response.collection[i].title) > -1) {
+// 				localStorage.setItem("fullLibrary", JSON.stringify(fullLibrary));
+// 				fullLibrary = fullLibrary;
+// 				renderLibrary(fullLibrary);
+// 				return;
+// 			} 
+// 			else {
+// 				fullLibrary.unshift(response.collection[i]);
+// 			}
+// 		}
+// 	});	
+// }
+
+var loadPlaylists = function() {
+	var client_id ='96089e67110795b69a95705f38952d8f'
+	$.get('http://api.soundcloud.com/users/29864265/playlists?client_id='+client_id, function(response) {
+			response.forEach(function(playlist) {
+				$('#main').append('<h1>'+playlist.title+'</h1>');
+				playlist.tracks.forEach(function(song) {
+					$('#main').append('<h3>'+song.user.username+'</h3>');
+					$('#main').append('<p>'+song.title+'</p>');					
+				});
+			})
+		});		
 }
 
 //-------------------------------------------------------------------------------------------------------//
 var toggle = function(button) {
-	if ($('#sort'+button).attr('sort') == 'descending') {
-		$('#sort'+button).attr('sort', 'ascending');
+	if ($('#sort-'+button).attr('sort') == 'descending') {
+		$('#sort-'+button).attr('sort', 'ascending');
 	} else {
-		$('#sort'+button).attr('sort', 'descending');
+		$('#sort-'+button).attr('sort', 'descending');
 	}	
 }
 
-$('#sortTitle').click(function() {
-	toggle('Title');
+$('#sort-title').click(function() {
+	toggle('title');
 	librarySort = 0;
 	renderLibrary(fullLibrary);
 });
 
-$('#sortArtist').click(function() {
-	toggle('Artist');
+$('#sort-artist').click(function() {
+	toggle('artist');
 	librarySort = 1;
 	renderLibrary(fullLibrary);
 });
 
-$("#sortDate").click(function() {
-	toggle('Date');
+$("#sort-date").click(function() {
+	toggle('date');
 	librarySort = 2;
 	renderLibrary(fullLibrary);
 });
 
-$("#shuffle").click(function() {
+$("#sort-favorites").click(function() {
+	toggle('favorites');
 	librarySort = 3;
+	renderLibrary(fullLibrary);
+});
+
+$("#sort-plays").click(function() {
+	toggle('plays');
+	librarySort = 4;
+	renderLibrary(fullLibrary);
+});
+
+$("#shuffle").click(function() {
+	librarySort = 5;
 	renderLibrary(fullLibrary);
 });
 
@@ -341,6 +402,7 @@ var startLibrary = function() {
 $(document).ready(function() {
 
 	startLibrary();
+	//loadPlaylists();
 });
 
 
