@@ -61,8 +61,6 @@
 //     }
 // });
 
-
-
 var renderLibrary = function(displayList, filterOnly) {
 	// ReactDOM.render(
 	//   <SongList data={fullLibrary}/>,
@@ -75,7 +73,7 @@ var renderLibrary = function(displayList, filterOnly) {
 
 	displayList.forEach(function(song) {
 		var container = document.createElement('div');
-		$(container).attr('song_id', song.id).addClass('song-container');
+		$(container).attr('song_id', song.id).addClass('song-container row');
 		var title = document.createElement('p');
 		$(title).addClass('song-title');
 		var artist = document.createElement('h3');
@@ -93,13 +91,12 @@ var renderLibrary = function(displayList, filterOnly) {
 		$(container).append(play);		
 		$(container).append(artist);
 		$(container).append(title);
-		$(container).append($('<p> Favorites: '+song.favoritings_count+' </p>').addClass('song-favorites'));
-		$(container).append($('<p> Plays: '+song.playback_count+'</p>').addClass('song-plays'));
+		$(container).append($('<p> Favorites: '+song.favoritings_count.toLocaleString()+' </p>').addClass('song-favorites'));
+		$(container).append($('<p> Plays: '+song.playback_count.toLocaleString()+'</p>').addClass('song-plays'));
 
 
 		$('#main').append(container);
 	});
-
 }
 
 var filterLibrary = function(library) {
