@@ -80,6 +80,17 @@ var renderLibrary = function(displayList, filterOnly) {
 		$(artist).addClass('song-artist')
 		var play = $('<span class="glyphicon glyphicon-play-circle" aria-hidden="true" style="font-size: 4em;"></span>')
 		play.click(function() {
+			if (currentSong && !currentSong.paused) {
+				currentSong.pause();
+				$(this).removeClass('glyphicon-pause').addClass('glyphicon-play-circle');
+				return;
+			}
+			if (currentSong && currentSong.src == (song.stream_url+'?client_id=96089e67110795b69a95705f38952d8f') && currentSong.paused) {
+				currentSong.play();
+				$(this).removeClass('glyphicon-play-circle').addClass('glyphicon-pause');
+				return;
+			}
+			$(this).removeClass('glyphicon-play-circle').addClass('glyphicon-pause');
 			if (currentSong) currentSong.pause();
 			currentSong = new Audio(song.stream_url+'?client_id=96089e67110795b69a95705f38952d8f');
 			currentSong.play();
@@ -96,6 +107,7 @@ var renderLibrary = function(displayList, filterOnly) {
 
 
 		$('#main').append(container);
+		$('#main').append('<hr>');
 	});
 }
 
@@ -232,10 +244,11 @@ var librarySort = null;
 
 var loadLibrary = function() {
 	var client_id = 'client_id=96089e67110795b69a95705f38952d8f'
-	$('#main').html('<p> Loading ... </p>');
+	$('#main').html('<p id="load-status"> Loading Your Full Library </p>');
 	$.get('http://api.soundcloud.com/users/29864265/favorites?'+client_id+'&limit=200&linked_partitioning=1', function(response) {
 			responseList.push(response.collection);
-			buildLibrary(response.next_href);	
+			buildLibrary(response.next_href);
+			$('#load-status').text('Loading Your Full Library ('+response.collection.length+' songs)');
 		});		
 }
 
@@ -245,6 +258,11 @@ var buildLibrary = function(next_href) {
 		console.log("Still loading...");
 		responseList.push(response.collection);
 		if (response.next_href) {
+			var loadedCount = 0;
+			responseList.forEach(function(collection) {
+				loadedCount += collection.length;
+			});
+			$('#load-status').text('Loading Your Full Library ('+loadedCount+' songs)');			
 			buildLibrary(response.next_href);
 		} 
 		else {
