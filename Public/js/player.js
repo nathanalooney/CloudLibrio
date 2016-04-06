@@ -1,114 +1,133 @@
 (function() {
 
 
-// var LibraryBox = React.createClass({
-//   render: function() {
-//     return (
-//       <div>
-//         <h1> SCLibrary </h1>
-//         <SongList data={this.props.data}/>
-//       </div>
-//     );
-//   }
-// });
+var LibraryBox = React.createClass({
+  render: function() {
+    return (
+      <div>
+        <SongList data={this.props.data}/>
+      </div>
+    );
+  }
+});
 
-// var PlayButton = React.createClass({
-// 	playSong: function() {
-// 		var id = this.props.id
-// 		console.log("/tracks/"+id);
-// 		SC.stream("/tracks/"+id).then(function(player) {
-// 			console.log(player);
-// 			player.play();
-// 		}).catch(function(error) {
-// 				console.log(error);
-// 			});
-// 	},
-// 	render: function() {
-// 		return (
-// 			<p onClick={this.playSong}>
-// 				PLAY
-// 			</p>
-// 			);
-// 	}
-// });
+var SongList = React.createClass({
+    render: function() {
+    	var songNodes = this.props.data.map(function(song, i) {
+      	return (
+          <Song song={song} key={i}>
+          </Song>
+        );
+    });
 
-// var Song = React.createClass({
-// 	render: function() {
-// 		return (
-// 			<div>
-// 				<h3> {this.props.artist} </h3>
-// 				<p> {this.props.title} </p>
-// 				<PlayButton id={this.props.id}></PlayButton>
-// 			</div>
-// 		);
-// 	}
-// });
+      return (
+        <div className="songList">
+          {songNodes}
+        </div>
+      );
+    }
+});
 
-// var SongList = React.createClass({
-//     render: function() {
-//       var songNodes = this.props.data.map(function(song) {
-//         return (
-//           <Song artist={song.user.username} title={song.title} id={song.id}>
-//           </Song>
-//         );
-//       });
+var Song = React.createClass({
+	render: function() {
+		return (
+			<div>
+				<h3> {this.props.song.user.username} </h3>
+				<p> {this.props.song.title} </p>
+				<PlayButton song={this.props.song}></PlayButton>
+			</div>
+		);
+	}
+});
 
-//       return (
-//         <div className="songList">
-//           {songNodes}
-//         </div>
-//       );
-//     }
-// });
+var PlayButton = React.createClass({
+	getInitialState: function() {
+		return {
+			isPlaying: false
+		};
+	},
+	playSong: function() {
+		var stream_url = this.props.song.stream_url+'?client_id=96089e67110795b69a95705f38952d8f';
+		if (currentSong) {
+			if (currentSong.src == stream_url) {
+				if (!currentSong.paused) {
+					currentSong.pause();
+					this.setState({isPlaying: false})				
+				} else {
+					currentSong.play();
+					this.setState({isPlaying: true})
+				}
+			} else {
+				currentSong = new Audio(stream_url);
+				currentSong.play();
+				this.setState({isPlaying: true})	
+			}		
+		} else {
+			currentSong = new Audio(stream_url);
+			currentSong.play();
+			this.setState({isPlaying: true})		
+		}
+	},
+	render: function() {
+		var glyph = this.state.isPlaying ? "pause" : "play-circle";
+		var glyph_class = "glyphicon glyphicon-"+glyph;
+		return (
+			<span className={glyph_class} onClick={this.playSong}></span>
+		);
+	}
+});
 
 var renderLibrary = function(displayList, filterOnly) {
-	// ReactDOM.render(
-	//   <SongList data={fullLibrary}/>,
-	//   document.getElementById('main')
-	// );
 	$('#main').empty();
 	if (!filterOnly) displayList = sortLibrary(displayList);	
 	sortedFullLibrary = displayList;
 	displayList = filterLibrary(displayList);
 
-	displayList.forEach(function(song) {
-		var container = document.createElement('div');
-		$(container).attr('song_id', song.id).addClass('song-container row');
-		var title = document.createElement('p');
-		$(title).addClass('song-title');
-		var artist = document.createElement('h3');
-		$(artist).addClass('song-artist')
-		var play = $('<span class="glyphicon glyphicon-play-circle" aria-hidden="true" style="font-size: 4em;"></span>')
-		play.click(function() {
-			if (currentSong && !currentSong.paused) {
-				currentSong.pause();
-				$(this).removeClass('glyphicon-pause').addClass('glyphicon-play-circle');
-				return;
-			}
-			if (currentSong && currentSong.src == (song.stream_url+'?client_id=96089e67110795b69a95705f38952d8f') && currentSong.paused) {
-				currentSong.play();
-				$(this).removeClass('glyphicon-play-circle').addClass('glyphicon-pause');
-				return;
-			}
-			$(this).removeClass('glyphicon-play-circle').addClass('glyphicon-pause');
-			if (currentSong) currentSong.pause();
-			currentSong = new Audio(song.stream_url+'?client_id=96089e67110795b69a95705f38952d8f');
-			currentSong.play();
-			$('#player').empty();
-			$('#player').append(song.user.username + ' : '+song.title);
-		});
-		$(artist).text(song.user.username);
-		$(title).text(song.title);
-		$(container).append(play);		
-		$(container).append(artist);
-		$(container).append(title);
-		$(container).append($('<p> Favorites: '+song.favoritings_count.toLocaleString()+' </p>').addClass('song-favorites'));
-		$(container).append($('<p> Plays: '+song.playback_count.toLocaleString()+'</p>').addClass('song-plays'));
+	ReactDOM.render(
+	  <SongList data={displayList}/>,
+	  document.getElementById('main')
+	);
 
 
-		$('#main').append(container);
-		$('#main').append('<hr>');
-	});
+
+	// displayList.forEach(function(song) {
+	// 	var container = document.createElement('div');
+	// 	$(container).attr('song_id', song.id).addClass('song-container row');
+	// 	var title = document.createElement('p');
+	// 	$(title).addClass('song-title');
+	// 	var artist = document.createElement('h3');
+	// 	$(artist).addClass('song-artist')
+	// 	var play = $('<span class="glyphicon glyphicon-play-circle" aria-hidden="true" style="font-size: 4em;"></span>')
+	// 	play.click(function() {
+	// 		if (currentSong && !currentSong.paused) {
+	// 			currentSong.pause();
+	// 			$(this).removeClass('glyphicon-pause').addClass('glyphicon-play-circle');
+	// 			return;
+	// 		}
+	// 		if (currentSong && currentSong.src == (song.stream_url+'?client_id=96089e67110795b69a95705f38952d8f') && currentSong.paused) {
+	// 			currentSong.play();
+	// 			$(this).removeClass('glyphicon-play-circle').addClass('glyphicon-pause');
+	// 			return;
+	// 		}
+	// 		$(this).removeClass('glyphicon-play-circle').addClass('glyphicon-pause');
+	// 		if (currentSong) currentSong.pause();
+	// 		currentSong = new Audio(song.stream_url+'?client_id=96089e67110795b69a95705f38952d8f');
+	// 		currentSong.play();
+	// 		$('#player').empty();
+	// 		$('#player').append(song.user.username + ' : '+song.title);
+	// 	});
+	// 	$(artist).text(song.user.username);
+	// 	$(title).text(song.title);
+	// 	$(container).append(play);		
+	// 	$(container).append(artist);
+	// 	$(container).append(title);
+	// 	$(container).append($('<p> Favorites: '+song.favoritings_count.toLocaleString()+' </p>').addClass('song-favorites'));
+	// 	$(container).append($('<p> Plays: '+song.playback_count.toLocaleString()+'</p>').addClass('song-plays'));
+
+
+	// 	$('#main').append(container);
+	// 	$('#main').append('<hr>');
+	// });
 }
 
 var filterLibrary = function(library) {

@@ -2,12 +2,12 @@
 <html lang="en">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8">
-		<!-- React.js -->
-<!-- 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.js"></script>
-	    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.0/react.js"></script>
-	    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.0/react-dom.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script> -->
-		<script   src="https://code.jquery.com/jquery-2.2.1.min.js"   integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="   crossorigin="anonymous"></script>
+
+		<script src="https://code.jquery.com/jquery-2.2.1.min.js" integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00=" crossorigin="anonymous"></script>
+		<!-- React -->
+		<script src="/js/react.js"></script>
+		<script src="/js/react-dom.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
 		<!-- Soundcloud -->
 		<script src="https://connect.soundcloud.com/sdk/sdk-3.0.0.js"></script>
 		<!-- Bootstrap -->
@@ -19,14 +19,17 @@
 		<link href='https://fonts.googleapis.com/css?family=Roboto:100' rel='stylesheet' type='text/css'>
 
 	    <style>
-	     #header-container {
-	        background-color: #4285f4;
-			box-shadow: 0 0 4px rgba(0,0,0,.14),0 4px 8px rgba(0,0,0,.28);
-		    color: #ffffff;
-		    position: fixed;
-		    width: 100%;
-		    z-index: 1;
-		    }
+			#header-container {
+				background-color: #4285f4;
+				box-shadow: 0 0 4px rgba(0,0,0,.14),0 4px 8px rgba(0,0,0,.28);
+				color: #ffffff;
+				position: fixed;
+				width: 100%;
+				z-index: 1;
+			}
+			.header {
+
+			}
 		    #player{
 		    	position: fixed;
 		    	background-color: #4285f4;
@@ -40,23 +43,33 @@
 		    	height: 100%;
 		    	margin-top: 180px;
 		    }
-	      .info-container {
-	        display: inline-block;
-	      }
-	      .title-container {
-	        display: inline-block;
-	      }
-	      body {
-	      	font-family: 'Roboto', sans-serif;
-	      }
-	      .glyphicon {
-	      	color: #FF8732;
-	      }
-	      html {
-	      	width: 100%;
-	      	height: 100%;
-	      	background: url(ripple.gif) center center no-repeat;
-	      }
+			.info-container {
+				display: inline-block;
+			}
+			.title-container {
+				display: inline-block;
+			}
+			body {
+				font-family: 'Roboto', sans-serif;
+			}
+			.glyphicon {
+				color: #FF8732;
+			}
+			.glyphicon-play-circle{
+				font-size: 4em;
+			}
+			.glyphicon-pause{
+				font-size: 4em;
+			}
+			html {
+				width: 100%;
+				height: 100%;
+				background: url(ripple.gif) center center no-repeat;
+			}
+			.sort-button {
+				display: inline;
+				padding: 10px;
+			}
 	    </style>
     </head>
   	<body>
@@ -71,15 +84,15 @@
 		  		<div class="row">
 			  		<div class="col-md-1"></div>
 			  		<div class="col-md-10" style="text-align: center;">
-				  		<p id="sort-date" class="sort-button" sort="descending" style="display: inline; padding: 10px;"> Date </p>
-				  		<p id="sort-title" class="sort-button" sort="descending" style="display: inline; padding: 10px;"> Title </p>
-				  		<p id="sort-artist" class="sort-button" sort="descending" style="display: inline; padding: 10px;"> Artist </p>
-				  		<p id="sort-favorites" class="sort-button" sort="descending" style="display: inline; padding: 10px;"> Likes </p>
-				  		<p id="sort-plays" class="sort-button" sort="descending" style="display: inline; padding: 10px;"> Plays </p>
-				  		<p id="shuffle" class="sort-button" sort="descending" style="display: inline; padding: 10px;"> Shuffle </p>
-				  		<label> Remixes: <input id="remixes" type="checkbox" style="display: inline; padding: 10px;" checked></label>
-				  		<label> Originals: <input id="originals" type="checkbox" style="display: inline; padding: 10px;" checked></label>
-				  		<p id="refresh" class="sort-button" sort="descending" style="display: inline; padding: 10px;"> Refresh </p>
+				  		<p id="sort-date" class="sort-button" sort="descending"> Date </p>
+				  		<p id="sort-title" class="sort-button" sort="descending"> Title </p>
+				  		<p id="sort-artist" class="sort-button" sort="descending"> Artist </p>
+				  		<p id="sort-favorites" class="sort-button" sort="descending"> Likes </p>
+				  		<p id="sort-plays" class="sort-button" sort="descending"> Plays </p>
+				  		<p id="shuffle" class="sort-button" sort="descending"> Shuffle </p>
+				  		<label> Remixes: <input id="remixes" type="checkbox" checked></label>
+				  		<label> Originals: <input id="originals" type="checkbox" checked></label>
+				  		<p id="refresh" class="sort-button" sort="descending"> Refresh </p>
 					</div>
 					<div class="col-md-1"></div>
 				</div>
@@ -93,22 +106,6 @@
 					<div class="col-md-1"></div>
 				</div>
 			</div>
-<!-- 		<div class="row">
-	  		<div class="col-md-1"></div>
-	  		<div class="col-md-10" style="">
-		  		<p id="" class="sort-button" sort="descending" style="display: inline; padding: 10px;"> Favorites </p>
-				<div class="dropdown">
-				  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Dropdown Example
-				  <span class="caret"></span></button>
-				  <ul class="dropdown-menu">
-				    <li><a href="#">HTML</a></li>
-				    <li><a href="#">CSS</a></li>
-				    <li><a href="#">JavaScript</a></li>
-				  </ul>
-				</div>
-			</div>
-			<div class="col-md-1"></div>
-		</div> -->
 		<div class="row">
 	  		<div class="col-md-1"></div>
 	  		<div class="col-md-10">
@@ -121,6 +118,6 @@
 		</div>
   	</body>
 
-	<script src="/js/player.js"></script>
+	<script src="/js/player.js" type="text/babel"></script>
 
 </html>
