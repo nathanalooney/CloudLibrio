@@ -15,8 +15,10 @@ var SongList = React.createClass({
     render: function() {
     	var songNodes = this.props.data.map(function(song, i) {
       	return (
-          <Song song={song} key={i}>
-          </Song>
+      		<div>
+	          <Song song={song} key={i}></Song>
+	          <hr/>
+          	</div>
         );
     });
 
@@ -47,25 +49,20 @@ var PlayButton = React.createClass({
 		};
 	},
 	playSong: function() {
-		var stream_url = this.props.song.stream_url+'?client_id=96089e67110795b69a95705f38952d8f';
-		if (currentSong) {
-			if (currentSong.src == stream_url) {
-				if (!currentSong.paused) {
-					currentSong.pause();
-					this.setState({isPlaying: false})				
+		var self = this;
+		var stream_url = self.props.song.stream_url+'?client_id=96089e67110795b69a95705f38952d8f';
+		if (songPlayer.currentSong) {
+			if (songPlayer.currentSong.src == stream_url) {
+				if (!songPlayer.isPaused()) {
+					songPlayer.pause(self);			
 				} else {
-					currentSong.play();
-					this.setState({isPlaying: true})
+					songPlayer.play(self);
 				}
 			} else {
-				currentSong = new Audio(stream_url);
-				currentSong.play();
-				this.setState({isPlaying: true})	
+				songPlayer.playNew(self, stream_url);
 			}		
 		} else {
-			currentSong = new Audio(stream_url);
-			currentSong.play();
-			this.setState({isPlaying: true})		
+			songPlayer.playNew(self, stream_url);
 		}
 	},
 	render: function() {
@@ -80,11 +77,10 @@ var PlayButton = React.createClass({
 var renderLibrary = function(displayList, filterOnly) {
 	$('#main').empty();
 	if (!filterOnly) displayList = sortLibrary(displayList);	
-	sortedFullLibrary = displayList;
-	displayList = filterLibrary(displayList);
+	songPlayer.playlist = filterLibrary(displayList);
 
 	ReactDOM.render(
-	  <SongList data={displayList}/>,
+	  <SongList data={songPlayer.playlist}/>,
 	  document.getElementById('main')
 	);
 
@@ -132,6 +128,7 @@ var renderLibrary = function(displayList, filterOnly) {
 
 var filterLibrary = function(library) {
 	var returnLibrary = [];
+	var count = 0;
 	library.forEach(function(song) {
 		var isRemix = false;
 		var title = song.title.toLowerCase();
@@ -144,8 +141,16 @@ var filterLibrary = function(library) {
 				title.indexOf('redo') > -1) {
 			isRemix = true;
 		} 		
-		if ($('#remixes').is(':checked') && isRemix == true) returnLibrary.push(song);
-		if ($('#originals').is(':checked') && isRemix == false) returnLibrary.push(song); 
+		if ($('#remixes').is(':checked') && isRemix == true) {
+			song.playlist_id = count;
+			count++;
+			returnLibrary.push(song);
+		} 
+		if ($('#originals').is(':checked') && isRemix == false) {
+			song.playlist_id = count;
+			count++;
+			returnLibrary.push(song);
+		}  
 	});
 	return returnLibrary;
 }
@@ -255,11 +260,38 @@ var shuffle = function(library) {
 
 
 var fullLibrary = [];
-var sortedFullLibrary = [];
 var responseList = [];
 var searchTimer = null;
-var currentSong = null;
 var librarySort = null;
+var songPlayer = {
+	playlist: null,
+	previous: null,
+	current: null,
+	next: null,
+	playNew: function(self, stream_url) {
+		if (this.currentSong) this.currentSong.pause();
+		this.currentSong = new Audio(stream_url);
+		this.currentSong.addEventListener('pause', function() {
+			self.setState({isPlaying: false});
+		});
+		this.currentSong.addEventListener('ended', function() {
+			self.setState({isPlaying: false});
+		})
+		this.currentSong.play();
+		self.setState({isPlaying: true})
+	},
+	play: function(self) {
+		songPlayer.currentSong.play();
+		self.setState({isPlaying: true})	
+	},
+	pause: function(self) {
+		songPlayer.currentSong.pause();
+		self.setState({isPlaying: false})	
+	},
+	isPaused() {
+		return this.currentSong.paused;
+	}
+}
 
 var loadLibrary = function() {
 	var client_id = 'client_id=96089e67110795b69a95705f38952d8f'
