@@ -12,21 +12,31 @@ var LibraryBox = React.createClass({
 });
 
 var SongList = React.createClass({
-
 	getInitialState: function() {
 		return ({
-			currentSong: null,
+			playlist_id: null,
 			isPlaying: false
 		});
 	},
-	playSong: function(song_id) {
-		this.setState({currentSong: song_id});
+	playSong: function(song) {
+		if (this.state.playlist_id == song.playlist_id) {
+			this.setState({isPlaying: !this.state.isPlaying}, function() {
+				console.log(this.state.isPlaying);
+				//Gives you the original play status... this could be dumb we'll see.
+				(!this.state.isPlaying) ? songPlayer.pause() : songPlayer.play();
+			})
+		} else {
+			this.setState({playlist_id: song.playlist_id, isPlaying: true}, function() {
+				console.log(this.state.isPlaying);
+				songPlayer.playNew(song.stream_url)			
+			});			
+		}
 	},
     render: function() {
     	var songNodes = this.props.data.map(function(song, i) {
       	return (
       		<div key={i}>
-	          <Song song={song} playSong={this.playSong} currentSong={this.state.currentSong} ></Song>
+	          <Song song={song} playSong={this.playSong} playlist_id={this.state.playlist_id} ></Song>
 	          <hr/>
           	</div>
         );
@@ -45,7 +55,7 @@ var Song = React.createClass({
 		this.props.playSong(this.props.song);
 	},
 	render: function() {
-		var glyph = (this.props.currentSong === this.props.song.playlist_id) ? "pause" : "play-circle";
+		var glyph = (this.props.playlist_id === this.props.song.playlist_id) ? "pause" : "play-circle";
 		var glyph_class = "glyphicon glyphicon-"+glyph;
 		return (
 			<div>
@@ -210,25 +220,19 @@ var songPlayer = {
 	previous: null,
 	current: null,
 	next: null,
-	playNew: function(self, stream_url) {
+	playNew: function(stream_url) {
 		if (this.currentSong) this.currentSong.pause();
-		this.currentSong = new Audio(stream_url);
-		this.currentSong.addEventListener('pause', function() {
-			self.setState({isPlaying: false});
-		});
-		this.currentSong.addEventListener('ended', function() {
-			self.setState({isPlaying: false});
-		})
+		var full_stream_url = stream_url+'?client_id=96089e67110795b69a95705f38952d8f';
+		this.currentSong = new Audio(full_stream_url);
 		this.currentSong.play();
-		self.setState({isPlaying: true})
 	},
-	play: function(self) {
+	play: function() {
+		console.log("Play");
 		songPlayer.currentSong.play();
-		self.setState({isPlaying: true})	
 	},
-	pause: function(self) {
+	pause: function() {
+		console.log("Pause");
 		songPlayer.currentSong.pause();
-		self.setState({isPlaying: false})	
 	},
 	isPaused() {
 		return this.currentSong.paused;
