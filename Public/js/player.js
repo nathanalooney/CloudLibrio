@@ -1,4 +1,4 @@
-(function() {
+//(function() {
 
 
 var LibraryBox = React.createClass({
@@ -14,21 +14,24 @@ var LibraryBox = React.createClass({
 var SongList = React.createClass({
 	getInitialState: function() {
 		return ({
-			playlist_id: null,
-			isPlaying: false
+			playlist_id: songPlayer.current_id,
+			isPaused: songPlayer.isPaused(),
 		});
 	},
 	playSong: function(song) {
 		if (this.state.playlist_id == song.playlist_id) {
-			this.setState({isPlaying: !this.state.isPlaying}, function() {
-				console.log(this.state.isPlaying);
-				//Gives you the original play status... this could be dumb we'll see.
-				(!this.state.isPlaying) ? songPlayer.pause() : songPlayer.play();
-			})
+			if (!this.state.isPaused) {
+				this.setState({isPaused: true}, function() {
+					songPlayer.pause();
+				});
+			} else {
+				this.setState({isPaused: false}, function() {
+					songPlayer.play();
+				})
+			}
 		} else {
-			this.setState({playlist_id: song.playlist_id, isPlaying: true}, function() {
-				console.log(this.state.isPlaying);
-				songPlayer.playNew(song.stream_url)			
+			this.setState({playlist_id: song.playlist_id, isPaused: false}, function() {
+				songPlayer.playNew(song.playlist_id)			
 			});			
 		}
 	},
@@ -36,7 +39,7 @@ var SongList = React.createClass({
     	var songNodes = this.props.data.map(function(song, i) {
       	return (
       		<div key={i}>
-	          <Song song={song} playSong={this.playSong} playlist_id={this.state.playlist_id} ></Song>
+	          <Song song={song} playSong={this.playSong} playlist_id={this.state.playlist_id} isPaused={this.state.isPaused} ></Song>
 	          <hr/>
           	</div>
         );
@@ -52,10 +55,11 @@ var SongList = React.createClass({
 
 var Song = React.createClass({
 	playSong: function() {
+		console.log(this.props.isPaused)
 		this.props.playSong(this.props.song);
 	},
 	render: function() {
-		var glyph = (this.props.playlist_id === this.props.song.playlist_id) ? "pause" : "play-circle";
+		var glyph = (this.props.playlist_id === this.props.song.playlist_id && !this.props.isPaused) ? "pause" : "play-circle";
 		var glyph_class = "glyphicon glyphicon-"+glyph;
 		return (
 			<div>
@@ -67,6 +71,7 @@ var Song = React.createClass({
 	}
 });
 
+//------------------------------------------------------------------------------------------------
 var renderLibrary = function(displayList, filterOnly) {
 	$('#main').empty();
 	if (!filterOnly) displayList = sortLibrary(displayList);	
@@ -217,28 +222,70 @@ var searchTimer = null;
 var librarySort = null;
 var songPlayer = {
 	playlist: null,
-	previous: null,
-	current: null,
-	next: null,
-	playNew: function(stream_url) {
-		if (this.currentSong) this.currentSong.pause();
-		var full_stream_url = stream_url+'?client_id=96089e67110795b69a95705f38952d8f';
-		this.currentSong = new Audio(full_stream_url);
-		this.currentSong.play();
+	audio: null,
+	prev_id: null,
+	current_id: null,
+	next_id: null,
+	playNew: function(playlist_id) {
+		if (this.audio) this.audio.pause();
+		this._setIDs(playlist_id);	
+		var full_stream_url = this.playlist[playlist_id].stream_url+'?client_id=96089e67110795b69a95705f38952d8f';
+		this.audio = new Audio(full_stream_url);
+		this.audio.addEventListener('ended', this._addNextSongHandler.bind(this));
+		this.audio.play();
 	},
 	play: function() {
 		console.log("Play");
-		songPlayer.currentSong.play();
+		songPlayer.audio.play();
 	},
 	pause: function() {
 		console.log("Pause");
-		songPlayer.currentSong.pause();
+		songPlayer.audio.pause();
 	},
-	isPaused() {
-		return this.currentSong.paused;
+	isPaused: function() {
+		if (this.audio) {
+			return this.audio.paused;			
+		} else {
+			return true;
+		}
+	},
+	playNext: function() {
+		this.audio.pause();
+		this._setIDs(this.next_id);
+		var full_stream_url = this.playlist[this.current_id].stream_url+'?client_id=96089e67110795b69a95705f38952d8f';
+		this.audio = new Audio(full_stream_url);
+		this.audio.play();
+		renderLibrary(fullLibrary);			
+	},
+	playPrevious: function() {
+		this.audio.pause();
+		this._setIDs(this.prev_id);
+		var full_stream_url = this.playlist[this.current_id].stream_url+'?client_id=96089e67110795b69a95705f38952d8f';
+		this.audio = new Audio(full_stream_url);
+		this.audio.play();
+		renderLibrary(fullLibrary);				
+	},
+	_setIDs: function(playlist_id) {
+		this.next_id = playlist_id+1;
+		this.current_id = playlist_id;
+		this.prev_id = playlist_id-1;	
+	},
+	_addNextSongHandler: function() {
+		this._setIDs(this.current_id+1);
+		var full_stream_url = this.playlist[this.current_id].stream_url+'?client_id=96089e67110795b69a95705f38952d8f';
+		this.audio = new Audio(full_stream_url);
+		this.audio.addEventListener('ended', this._addNextSongHandler.bind(this));
+		this.audio.play();
+		renderLibrary(fullLibrary);				
 	}
 }
 
+ $('#play_next').click(function() {
+ 	songPlayer.playNext();
+ });
+$('#play_prev').click(function() {
+	songPlayer.playPrevious();
+});
 var loadLibrary = function() {
 	var client_id = 'client_id=96089e67110795b69a95705f38952d8f'
 	$('#main').html('<p id="load-status"> Loading Your Full Library </p>');
@@ -287,27 +334,6 @@ var combineLists = function() {
 	console.log('Calling render...')
 	renderLibrary(fullLibrary);	
 }
-
-// var addNewFavorites = function() {
-// 	SC.get('/users/29864265/favorites', {limit: 50, linked_partitioning: 1}).then(function(response) {
-// 		var responseLength = response.collection.length;
-// 		var recentSongs = [];
-// 		for (var i = 0; i < 25; i++) {
-// 			recentSongs.push(fullLibrary[i].title);
-// 		}
-// 		for (var i = 0; i < responseLength; i++) {
-// 			if (recentSongs.indexOf(response.collection[i].title) > -1) {
-// 				localStorage.setItem("fullLibrary", JSON.stringify(fullLibrary));
-// 				fullLibrary = fullLibrary;
-// 				renderLibrary(fullLibrary);
-// 				return;
-// 			} 
-// 			else {
-// 				fullLibrary.unshift(response.collection[i]);
-// 			}
-// 		}
-// 	});	
-// }
 
 var loadPlaylists = function() {
 	var client_id ='96089e67110795b69a95705f38952d8f'
@@ -412,13 +438,11 @@ var startLibrary = function() {
 
 //Kick off the site.
 $(document).ready(function() {
-
 	startLibrary();
-	//loadPlaylists();
 });
 
 
-})();
+//})();
 
 
 
