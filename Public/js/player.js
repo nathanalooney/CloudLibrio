@@ -1,4 +1,4 @@
-//(function() {
+(function() {
 
 
 var LibraryBox = React.createClass({
@@ -37,19 +37,19 @@ var SongList = React.createClass({
 	},
     render: function() {
     	var songNodes = this.props.data.map(function(song, i) {
-      	return (
-      		<div key={i}>
-	          <Song song={song} playSong={this.playSong} playlist_id={this.state.playlist_id} isPaused={this.state.isPaused} ></Song>
-	          <hr/>
-          	</div>
-        );
-    }, this);
+	      	return (
+	      		<div key={i}>
+		          <Song song={song} playSong={this.playSong} playlist_id={this.state.playlist_id} isPaused={this.state.isPaused} ></Song>
+		          <hr/>
+	          	</div>
+	        );
+	    }, this);
 
-      return (
-        <div className="songList">
-          {songNodes}
-        </div>
-      );
+		return (
+		<div className="songList">
+		  {songNodes}
+		</div>
+		);
     }
 });
 
@@ -74,40 +74,58 @@ var Song = React.createClass({
 //------------------------------------------------------------------------------------------------
 var renderLibrary = function(displayList, filterOnly) {
 	$('#main').empty();
-	if (!filterOnly) displayList = sortLibrary(displayList);	
-	songPlayer.playlist = filterLibrary(displayList);
-
+	var filteredPlaylist = filterLibrary(displayList);
+	var sortedPlaylist = sortLibrary(filteredPlaylist);	
+	songPlayer.playlist = applyPlaylistIDs(sortedPlaylist);
 	ReactDOM.render(
 	  <SongList data={songPlayer.playlist}/>,
 	  document.getElementById('main')
 	);
 }
 
+var applyPlaylistIDs = function(playlist) {
+	for (var i = 0; i < playlist.length; i++) {
+		playlist[i].playlist_id = i;
+	}
+	return playlist;
+}
+
 var filterLibrary = function(library) {
 	var returnLibrary = [];
-	var count = 0;
 	library.forEach(function(song) {
-		var isRemix = false;
+
 		var title = song.title.toLowerCase();
-		if (title.indexOf("remix") > -1 ||
-				title.indexOf("edit") > -1 ||
-				title.indexOf("mashup") > -1 || 
-				title.indexOf("flip") > -1 || 
-				title.indexOf("cover") > -1 ||
-				title.indexOf("bootleg") > -1 ||
-				title.indexOf('redo') > -1) {
-			isRemix = true;
-		} 		
-		if ($('#remixes').is(':checked') && isRemix == true) {
-			song.playlist_id = count;
-			count++;
-			returnLibrary.push(song);
-		} 
-		if ($('#originals').is(':checked') && isRemix == false) {
-			song.playlist_id = count;
-			count++;
-			returnLibrary.push(song);
-		}  
+		var user = song.user.username.toLowerCase();
+		var term = $('#searchbar').val().toLowerCase();
+		if (term.length > 0) {
+			if (title.indexOf(term) > -1 || user.toLowerCase().indexOf(term) > -1) {
+				var isRemix = false;
+				if (title.indexOf("remix") > -1 ||
+						title.indexOf("edit") > -1 ||
+						title.indexOf("mashup") > -1 || 
+						title.indexOf("flip") > -1 || 
+						title.indexOf("cover") > -1 ||
+						title.indexOf("bootleg") > -1 ||
+						title.indexOf('redo') > -1) {
+					isRemix = true;
+				} 		
+				if ($('#remixes').is(':checked') && isRemix == true) returnLibrary.push(song);
+				if ($('#originals').is(':checked') && isRemix == false) returnLibrary.push(song);
+			}
+		} else {
+			var isRemix = false;
+			if (title.indexOf("remix") > -1 ||
+					title.indexOf("edit") > -1 ||
+					title.indexOf("mashup") > -1 || 
+					title.indexOf("flip") > -1 || 
+					title.indexOf("cover") > -1 ||
+					title.indexOf("bootleg") > -1 ||
+					title.indexOf('redo') > -1) {
+				isRemix = true;
+			} 		
+			if ($('#remixes').is(':checked') && isRemix == true) returnLibrary.push(song);
+			if ($('#originals').is(':checked') && isRemix == false) returnLibrary.push(song);			
+		}
 	});
 	return returnLibrary;
 }
@@ -407,12 +425,7 @@ $('#refresh').click(function() {
 $('#searchbar').keyup(function() {
 	clearTimeout(searchTimer);
 	searchTimer = setTimeout(function() {
-		var term = $('#searchbar').val();
-		var searchLibrary = []
-		fullLibrary.forEach(function(song) {
-			if (song.title.toLowerCase().indexOf(term.toLowerCase()) > -1 || song.user.username.toLowerCase().indexOf(term.toLowerCase()) > -1) searchLibrary.push(song);
-		});
-		renderLibrary(searchLibrary, true);
+		renderLibrary(fullLibrary, true);
 	}, 250);
 });
 
@@ -442,7 +455,7 @@ $(document).ready(function() {
 });
 
 
-//})();
+})();
 
 
 
