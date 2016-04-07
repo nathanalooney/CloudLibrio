@@ -5,7 +5,7 @@ var LibraryBox = React.createClass({
   render: function() {
     return (
       <div>
-        <SongList data={this.props.data}/>
+        <SongList songs={this.props.songs}/>
       </div>
     );
   }
@@ -14,12 +14,12 @@ var LibraryBox = React.createClass({
 var SongList = React.createClass({
 	getInitialState: function() {
 		return ({
-			playlist_id: songPlayer.current_id,
+			soundcloud_id: songPlayer.soundcloud_id,
 			isPaused: songPlayer.isPaused(),
 		});
 	},
 	playSong: function(song) {
-		if (this.state.playlist_id == song.playlist_id) {
+		if (this.state.soundcloud_id == song.id) {
 			if (!this.state.isPaused) {
 				this.setState({isPaused: true}, function() {
 					songPlayer.pause();
@@ -30,16 +30,16 @@ var SongList = React.createClass({
 				})
 			}
 		} else {
-			this.setState({playlist_id: song.playlist_id, isPaused: false}, function() {
-				songPlayer.playNew(song.playlist_id)			
+			this.setState({soundcloud_id: song.id, isPaused: false}, function() {
+				songPlayer.playNew(song);
 			});			
 		}
 	},
     render: function() {
-    	var songNodes = this.props.data.map(function(song, i) {
+    	var songNodes = this.props.songs.map(function(song, i) {
 	      	return (
 	      		<div key={i}>
-		          <Song song={song} playSong={this.playSong} playlist_id={this.state.playlist_id} isPaused={this.state.isPaused} ></Song>
+		          <Song song={song} playSong={this.playSong} soundcloud_id={this.state.soundcloud_id} isPaused={this.state.isPaused} ></Song>
 		          <hr/>
 	          	</div>
 	        );
@@ -55,11 +55,10 @@ var SongList = React.createClass({
 
 var Song = React.createClass({
 	playSong: function() {
-		console.log(this.props.isPaused)
 		this.props.playSong(this.props.song);
 	},
 	render: function() {
-		var glyph = (this.props.playlist_id === this.props.song.playlist_id && !this.props.isPaused) ? "pause" : "play-circle";
+		var glyph = (this.props.soundcloud_id === this.props.song.id && !this.props.isPaused) ? "pause" : "play-circle";
 		var glyph_class = "glyphicon glyphicon-"+glyph;
 		return (
 			<div>
@@ -78,7 +77,7 @@ var renderLibrary = function(displayList, filterOnly) {
 	var sortedPlaylist = sortLibrary(filteredPlaylist);	
 	songPlayer.playlist = applyPlaylistIDs(sortedPlaylist);
 	ReactDOM.render(
-	  <SongList data={songPlayer.playlist}/>,
+	  <SongList songs={songPlayer.playlist}/>,
 	  document.getElementById('main')
 	);
 }
@@ -239,15 +238,20 @@ var responseList = [];
 var searchTimer = null;
 var librarySort = null;
 var songPlayer = {
+	is_dissociated: false,
+	dissociated_playlist: null,
 	playlist: null,
 	audio: null,
+	soundcloud_id: null,
 	prev_id: null,
 	current_id: null,
 	next_id: null,
-	playNew: function(playlist_id) {
+	playNew: function(song) {
+		this.associate();
 		if (this.audio) this.audio.pause();
-		this._setIDs(playlist_id);	
-		var full_stream_url = this.playlist[playlist_id].stream_url+'?client_id=96089e67110795b69a95705f38952d8f';
+		this._setIDs(song.playlist_id);	
+		this.soundcloud_id = song.id;
+		var full_stream_url = this.playlist[song.playlist_id].stream_url+'?client_id=96089e67110795b69a95705f38952d8f';
 		this.audio = new Audio(full_stream_url);
 		this.audio.addEventListener('ended', this._addNextSongHandler.bind(this));
 		this.audio.play();
@@ -269,8 +273,16 @@ var songPlayer = {
 	},
 	playNext: function() {
 		this.audio.pause();
+		console.log(this.is_dissociated)
 		this._setIDs(this.next_id);
-		var full_stream_url = this.playlist[this.current_id].stream_url+'?client_id=96089e67110795b69a95705f38952d8f';
+
+		if (!this.is_dissociated) {
+			this.soundcloud_id = this.playlist[this.current_id].id;
+			var full_stream_url = this.playlist[this.current_id].stream_url+'?client_id=96089e67110795b69a95705f38952d8f';
+		} else {
+			this.soundcloud_id = this.dissociated_playlist[this.current_id].id;
+			var full_stream_url = this.dissociated_playlist[this.current_id].stream_url+'?client_id=96089e67110795b69a95705f38952d8f';
+		}
 		this.audio = new Audio(full_stream_url);
 		this.audio.play();
 		renderLibrary(fullLibrary);			
@@ -278,10 +290,16 @@ var songPlayer = {
 	playPrevious: function() {
 		this.audio.pause();
 		this._setIDs(this.prev_id);
-		var full_stream_url = this.playlist[this.current_id].stream_url+'?client_id=96089e67110795b69a95705f38952d8f';
+		if (!this.is_dissociated) {
+			this.soundcloud_id = this.playlist[this.current_id].id;
+			var full_stream_url = this.playlist[this.current_id].stream_url+'?client_id=96089e67110795b69a95705f38952d8f';
+		} else {
+			this.soundcloud_id = this.dissociated_playlist[this.current_id].id;
+			var full_stream_url = this.dissociated_playlist[this.current_id].stream_url+'?client_id=96089e67110795b69a95705f38952d8f';
+		}
 		this.audio = new Audio(full_stream_url);
 		this.audio.play();
-		renderLibrary(fullLibrary);				
+		renderLibrary(fullLibrary);
 	},
 	_setIDs: function(playlist_id) {
 		this.next_id = playlist_id+1;
@@ -290,11 +308,26 @@ var songPlayer = {
 	},
 	_addNextSongHandler: function() {
 		this._setIDs(this.current_id+1);
-		var full_stream_url = this.playlist[this.current_id].stream_url+'?client_id=96089e67110795b69a95705f38952d8f';
+		if (!this.is_dissociated) {
+			this.soundcloud_id = this.playlist[this.current_id].id;
+			var full_stream_url = this.playlist[this.current_id].stream_url+'?client_id=96089e67110795b69a95705f38952d8f';
+		} else {
+			this.soundcloud_id = this.dissociated_playlist[this.current_id].id;
+			var full_stream_url = this.dissociated_playlist[this.current_id].stream_url+'?client_id=96089e67110795b69a95705f38952d8f';
+		}
 		this.audio = new Audio(full_stream_url);
 		this.audio.addEventListener('ended', this._addNextSongHandler.bind(this));
 		this.audio.play();
-		renderLibrary(fullLibrary);				
+		renderLibrary(fullLibrary);		
+	},
+	dissociate: function() {
+		if (this.is_dissociated) return; 
+		this.is_dissociated = true;
+		this.dissociated_playlist = this.playlist.slice();
+	},
+	associate: function() {
+		this.is_dissociated = false;
+		this.dissociated_playlist = null;
 	}
 }
 
@@ -378,53 +411,63 @@ var toggle = function(button) {
 $('#sort-title').click(function() {
 	toggle('title');
 	librarySort = 0;
+	songPlayer.dissociate();
 	renderLibrary(fullLibrary);
 });
 
 $('#sort-artist').click(function() {
 	toggle('artist');
 	librarySort = 1;
+	songPlayer.dissociate();
 	renderLibrary(fullLibrary);
 });
 
 $("#sort-date").click(function() {
 	toggle('date');
 	librarySort = 2;
+	songPlayer.dissociate();
 	renderLibrary(fullLibrary);
 });
 
 $("#sort-favorites").click(function() {
 	toggle('favorites');
 	librarySort = 3;
+	songPlayer.dissociate();
 	renderLibrary(fullLibrary);
 });
 
 $("#sort-plays").click(function() {
 	toggle('plays');
 	librarySort = 4;
+	songPlayer.dissociate();
 	renderLibrary(fullLibrary);
 });
 
 $("#shuffle").click(function() {
 	librarySort = 5;
+	songPlayer.dissociate();
 	renderLibrary(fullLibrary);
 });
 
 $("#remixes").change(function() {
+	songPlayer.dissociate();
 	renderLibrary(sortedFullLibrary, true);
 });
 
 $("#originals").change(function() {
+	songPlayer.dissociate();
 	renderLibrary(sortedFullLibrary, true);
 });
 
 $('#refresh').click(function() {
+	songPlayer.dissociate();
 	loadLibrary();
 });
 
 $('#searchbar').keyup(function() {
 	clearTimeout(searchTimer);
 	searchTimer = setTimeout(function() {
+		songPlayer.dissociate();
 		renderLibrary(fullLibrary, true);
 	}, 250);
 });
