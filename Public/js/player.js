@@ -12,15 +12,25 @@ var LibraryBox = React.createClass({
 });
 
 var SongList = React.createClass({
+
+	getInitialState: function() {
+		return ({
+			currentSong: null,
+			isPlaying: false
+		});
+	},
+	playSong: function(song_id) {
+		this.setState({currentSong: song_id});
+	},
     render: function() {
     	var songNodes = this.props.data.map(function(song, i) {
       	return (
-      		<div>
-	          <Song song={song} key={i}></Song>
+      		<div key={i}>
+	          <Song song={song} playSong={this.playSong} currentSong={this.state.currentSong} ></Song>
 	          <hr/>
           	</div>
         );
-    });
+    }, this);
 
       return (
         <div className="songList">
@@ -31,45 +41,18 @@ var SongList = React.createClass({
 });
 
 var Song = React.createClass({
+	playSong: function() {
+		this.props.playSong(this.props.song);
+	},
 	render: function() {
+		var glyph = (this.props.currentSong === this.props.song.playlist_id) ? "pause" : "play-circle";
+		var glyph_class = "glyphicon glyphicon-"+glyph;
 		return (
 			<div>
 				<h3> {this.props.song.user.username} </h3>
 				<p> {this.props.song.title} </p>
-				<PlayButton song={this.props.song}></PlayButton>
+				<span className={glyph_class} onClick={this.playSong}></span>
 			</div>
-		);
-	}
-});
-
-var PlayButton = React.createClass({
-	getInitialState: function() {
-		return {
-			isPlaying: false
-		};
-	},
-	playSong: function() {
-		var self = this;
-		var stream_url = self.props.song.stream_url+'?client_id=96089e67110795b69a95705f38952d8f';
-		if (songPlayer.currentSong) {
-			if (songPlayer.currentSong.src == stream_url) {
-				if (!songPlayer.isPaused()) {
-					songPlayer.pause(self);			
-				} else {
-					songPlayer.play(self);
-				}
-			} else {
-				songPlayer.playNew(self, stream_url);
-			}		
-		} else {
-			songPlayer.playNew(self, stream_url);
-		}
-	},
-	render: function() {
-		var glyph = this.state.isPlaying ? "pause" : "play-circle";
-		var glyph_class = "glyphicon glyphicon-"+glyph;
-		return (
-			<span className={glyph_class} onClick={this.playSong}></span>
 		);
 	}
 });
@@ -83,47 +66,6 @@ var renderLibrary = function(displayList, filterOnly) {
 	  <SongList data={songPlayer.playlist}/>,
 	  document.getElementById('main')
 	);
-
-
-
-	// displayList.forEach(function(song) {
-	// 	var container = document.createElement('div');
-	// 	$(container).attr('song_id', song.id).addClass('song-container row');
-	// 	var title = document.createElement('p');
-	// 	$(title).addClass('song-title');
-	// 	var artist = document.createElement('h3');
-	// 	$(artist).addClass('song-artist')
-	// 	var play = $('<span class="glyphicon glyphicon-play-circle" aria-hidden="true" style="font-size: 4em;"></span>')
-	// 	play.click(function() {
-	// 		if (currentSong && !currentSong.paused) {
-	// 			currentSong.pause();
-	// 			$(this).removeClass('glyphicon-pause').addClass('glyphicon-play-circle');
-	// 			return;
-	// 		}
-	// 		if (currentSong && currentSong.src == (song.stream_url+'?client_id=96089e67110795b69a95705f38952d8f') && currentSong.paused) {
-	// 			currentSong.play();
-	// 			$(this).removeClass('glyphicon-play-circle').addClass('glyphicon-pause');
-	// 			return;
-	// 		}
-	// 		$(this).removeClass('glyphicon-play-circle').addClass('glyphicon-pause');
-	// 		if (currentSong) currentSong.pause();
-	// 		currentSong = new Audio(song.stream_url+'?client_id=96089e67110795b69a95705f38952d8f');
-	// 		currentSong.play();
-	// 		$('#player').empty();
-	// 		$('#player').append(song.user.username + ' : '+song.title);
-	// 	});
-	// 	$(artist).text(song.user.username);
-	// 	$(title).text(song.title);
-	// 	$(container).append(play);		
-	// 	$(container).append(artist);
-	// 	$(container).append(title);
-	// 	$(container).append($('<p> Favorites: '+song.favoritings_count.toLocaleString()+' </p>').addClass('song-favorites'));
-	// 	$(container).append($('<p> Plays: '+song.playback_count.toLocaleString()+'</p>').addClass('song-plays'));
-
-
-	// 	$('#main').append(container);
-	// 	$('#main').append('<hr>');
-	// });
 }
 
 var filterLibrary = function(library) {
