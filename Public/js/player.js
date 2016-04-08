@@ -90,8 +90,8 @@ var Song = React.createClass({
     console.log(Math.floor((((event.clientX - posX.x)/div.offsetWidth)*songPlayer.audio.duration)));
   },
 	render: function() {
-    // if (this.props.soundcloud_id === this.props.song.id && !document.getElementsByTagName('svg')[0] && !this.props.isPaused) visualizer();
-		var glyph = (this.props.soundcloud_id === this.props.song.id && !this.props.isPaused) ? "pause" : "play-circle";
+    var is_current_song = (this.props.soundcloud_id === this.props.song.id);
+		var glyph = (is_current_song && !this.props.isPaused) ? "pause" : "play-circle";
 		var glyph_class = "glyphicon glyphicon-"+glyph;
 		return (
 			<div>
@@ -101,6 +101,7 @@ var Song = React.createClass({
   				  <p> {this.props.song.title} </p>
           </div>
         <div id={'player_'+this.props.song.id} onClick={this.registerClick}></div>
+        {is_current_song ? <div><p id="current-time">0:00</p><p id="duration"> {songPlayer.millisToMinutesAndSeconds(this.props.song.duration)}</p></div> : null}
 			</div>
 		);
 	}
@@ -346,6 +347,11 @@ var songPlayer = {
 		this.audio = new Audio(full_stream_url);
     this.audio.crossOrigin = "anonymous";
 		this.audio.addEventListener('ended', this._addNextSongHandler.bind(this));
+    this.audio.addEventListener('timeupdate', function() {
+      document.getElementById('current-time').innerHTML = "Poop"
+      console.log(document.getElementById('current-time').innerHTML);
+      document.getElementById('current-time').innerHTML = songPlayer.millisToMinutesAndSeconds(this.currentTime);
+    });
 		this.audio.play();
     clearVisualizer();
     visualizer(this, song.id);
@@ -379,6 +385,10 @@ var songPlayer = {
 		}
 		this.audio = new Audio(full_stream_url);
     this.audio.crossOrigin = "anonymous";
+    this.audio.addEventListener('ended', this._addNextSongHandler.bind(this));
+    this.audio.addEventListener('timeupdate', function() {
+      document.getElementById('current-time').innerHTML = songPlayer.millisToMinutesAndSeconds(this.currentTime);
+    });
 		this.audio.play();
 		renderLibrary(fullLibrary);			
     clearVisualizer();
@@ -396,6 +406,10 @@ var songPlayer = {
 		}
 		this.audio = new Audio(full_stream_url);
     this.audio.crossOrigin = "anonymous";
+    this.audio.addEventListener('ended', this._addNextSongHandler.bind(this));
+    this.audio.addEventListener('timeupdate', function() {
+      document.getElementById('current-time').innerHTML = songPlayer.millisToMinutesAndSeconds(this.currentTime);
+    });
 		this.audio.play();
 		renderLibrary(fullLibrary);
     clearVisualizer();
@@ -417,6 +431,9 @@ var songPlayer = {
 		}
 		this.audio = new Audio(full_stream_url);
 		this.audio.addEventListener('ended', this._addNextSongHandler.bind(this));
+    this.audio.addEventListener('timeupdate', function() {
+      document.getElementById('current-time').innerHTML = songPlayer.millisToMinutesAndSeconds(this.currentTime);
+    });
 		this.audio.play();
 		renderLibrary(fullLibrary);		
 	},
@@ -428,7 +445,12 @@ var songPlayer = {
 	associate: function() {
 		this.is_dissociated = false;
 		this.dissociated_playlist = null;
-	}
+	},
+  millisToMinutesAndSeconds: function(millis) {
+    var minutes = Math.floor(millis / 60000);
+    var seconds = ((millis % 60000) / 1000).toFixed(0);
+    return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+  }
 }
 
 
