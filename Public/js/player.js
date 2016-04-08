@@ -90,6 +90,7 @@ var Song = React.createClass({
     console.log(Math.floor((((event.clientX - posX.x)/div.offsetWidth)*songPlayer.audio.duration)));
   },
 	render: function() {
+    // if (this.props.soundcloud_id === this.props.song.id && !document.getElementsByTagName('svg')[0] && !this.props.isPaused) visualizer();
 		var glyph = (this.props.soundcloud_id === this.props.song.id && !this.props.isPaused) ? "pause" : "play-circle";
 		var glyph_class = "glyphicon glyphicon-"+glyph;
 		return (
@@ -104,6 +105,36 @@ var Song = React.createClass({
 		);
 	}
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -274,6 +305,25 @@ var shuffle = function(library) {
 //----------------------------------------------------------------------------------------------------//
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 var fullLibrary = [];
 var responseList = [];
 var searchTimer = null;
@@ -297,6 +347,7 @@ var songPlayer = {
     this.audio.crossOrigin = "anonymous";
 		this.audio.addEventListener('ended', this._addNextSongHandler.bind(this));
 		this.audio.play();
+    clearVisualizer();
     visualizer(this, song.id);
 	},
 	play: function() {
@@ -327,8 +378,11 @@ var songPlayer = {
 			var full_stream_url = this.dissociated_playlist[this.current_id].stream_url+'?client_id=96089e67110795b69a95705f38952d8f';
 		}
 		this.audio = new Audio(full_stream_url);
+    this.audio.crossOrigin = "anonymous";
 		this.audio.play();
 		renderLibrary(fullLibrary);			
+    clearVisualizer();
+    visualizer();
 	},
 	playPrevious: function() {
 		this.audio.pause();
@@ -341,8 +395,11 @@ var songPlayer = {
 			var full_stream_url = this.dissociated_playlist[this.current_id].stream_url+'?client_id=96089e67110795b69a95705f38952d8f';
 		}
 		this.audio = new Audio(full_stream_url);
+    this.audio.crossOrigin = "anonymous";
 		this.audio.play();
 		renderLibrary(fullLibrary);
+    clearVisualizer();
+    visualizer();
 	},
 	_setIDs: function(playlist_id) {
 		this.next_id = playlist_id+1;
@@ -373,6 +430,37 @@ var songPlayer = {
 		this.dissociated_playlist = null;
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
  $('#play_next').click(function() {
  	songPlayer.playNext();
@@ -456,6 +544,8 @@ $('#sort-title').click(function() {
 	librarySort = 0;
 	songPlayer.dissociate();
 	renderLibrary(fullLibrary);
+  clearVisualizer();
+  visualizer();
 });
 
 $('#sort-artist').click(function() {
@@ -463,6 +553,8 @@ $('#sort-artist').click(function() {
 	librarySort = 1;
 	songPlayer.dissociate();
 	renderLibrary(fullLibrary);
+  clearVisualizer();
+  visualizer();
 });
 
 $("#sort-date").click(function() {
@@ -470,6 +562,8 @@ $("#sort-date").click(function() {
 	librarySort = 2;
 	songPlayer.dissociate();
 	renderLibrary(fullLibrary);
+  clearVisualizer();
+  visualizer();
 });
 
 $("#sort-favorites").click(function() {
@@ -477,6 +571,8 @@ $("#sort-favorites").click(function() {
 	librarySort = 3;
 	songPlayer.dissociate();
 	renderLibrary(fullLibrary);
+  clearVisualizer();
+  visualizer();
 });
 
 $("#sort-plays").click(function() {
@@ -484,22 +580,30 @@ $("#sort-plays").click(function() {
 	librarySort = 4;
 	songPlayer.dissociate();
 	renderLibrary(fullLibrary);
+  clearVisualizer();
+  visualizer();
 });
 
 $("#shuffle").click(function() {
 	librarySort = 5;
 	songPlayer.dissociate();
 	renderLibrary(fullLibrary);
+  clearVisualizer();
+  visualizer();
 });
 
 $("#remixes").change(function() {
 	songPlayer.dissociate();
 	renderLibrary(fullLibrary, true);
+  clearVisualizer();
+  visualizer();
 });
 
 $("#originals").change(function() {
 	songPlayer.dissociate();
 	renderLibrary(fullLibrary, true);
+  clearVisualizer();
+  visualizer();
 });
 
 $('#refresh').click(function() {
@@ -540,15 +644,23 @@ $(document).ready(function() {
 	startLibrary();
 });
 
+var clearVisualizer = function() {
+  var svg = document.getElementsByTagName('svg')[0];
+  if (svg)  svg.parentNode.removeChild(svg);
+  if (songPlayer.audioCtx) songPlayer.audioCtx.close();
+  songPlayer.audioCtx = null;
+}
+
+
 var visualizer = function() {
   var song_id = songPlayer.soundcloud_id;
-  var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  var audioSrc = audioCtx.createMediaElementSource(songPlayer.audio);
-  var analyser = audioCtx.createAnalyser();
+  songPlayer.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  var audioSrc = songPlayer.audioCtx.createMediaElementSource(songPlayer.audio);
+  var analyser = songPlayer.audioCtx.createAnalyser();
 
   // Bind our analyser to the media element source.
   audioSrc.connect(analyser);
-  audioSrc.connect(audioCtx.destination);
+  audioSrc.connect(songPlayer.audioCtx.destination);
 
   //var frequencyData = new Uint8Array(analyser.frequencyBinCount);
   var frequencyData = new Uint8Array(256);
@@ -572,16 +684,9 @@ var visualizer = function() {
       })
       .attr('width', svgWidth / frequencyData.length - barPadding);
 
-
-  // d3.select(window).on('resize', function() {
-  //   var width = document.getElementById('player_'+song_id).offsetWidth;
-  //   console.log(width);
-  //   d3.select("player_"+song_id).attr("width", width);
-  // });
-
   // Continuously loop and update chart with frequency data.
   function renderChart() {
-       requestAnimationFrame(renderChart);
+       window.requestAnimationFrame(renderChart);
 
        // Copy frequency data to frequencyData array.
        analyser.getByteFrequencyData(frequencyData);
