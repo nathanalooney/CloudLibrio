@@ -540,11 +540,8 @@ $(document).ready(function() {
 	startLibrary();
 });
 
-
-})();
-
-
-var visualizer = function(songPlayer, song_id) {
+var visualizer = function() {
+  var song_id = songPlayer.soundcloud_id;
   var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   var audioSrc = audioCtx.createMediaElementSource(songPlayer.audio);
   var analyser = audioCtx.createAnalyser();
@@ -567,44 +564,62 @@ var visualizer = function(songPlayer, song_id) {
 
   // Create our initial D3 chart.
   svg.selectAll('rect')
-     .data(frequencyData)
-     .enter()
-     .append('rect')
-     .attr('x', function (d, i) {
+      .data(frequencyData)
+      .enter()
+      .append('rect')
+      .attr('x', function (d, i) {
         return i * (svgWidth / frequencyData.length);
-     })
-     .attr('width', svgWidth / frequencyData.length - barPadding);
+      })
+      .attr('width', svgWidth / frequencyData.length - barPadding);
+
+
+  // d3.select(window).on('resize', function() {
+  //   var width = document.getElementById('player_'+song_id).offsetWidth;
+  //   console.log(width);
+  //   d3.select("player_"+song_id).attr("width", width);
+  // });
 
   // Continuously loop and update chart with frequency data.
   function renderChart() {
-     requestAnimationFrame(renderChart);
+       requestAnimationFrame(renderChart);
 
-     // Copy frequency data to frequencyData array.
-     analyser.getByteFrequencyData(frequencyData);
+       // Copy frequency data to frequencyData array.
+       analyser.getByteFrequencyData(frequencyData);
 
-     // Update d3 chart with new data.
-     svg.selectAll('rect')
+       // Update d3 chart with new data.
+       svgWidth = document.getElementById('player_'+song_id).offsetWidth;
+       svg.attr('width', svgWidth);
+
+      svg.selectAll('rect')
         .data(frequencyData)
+        .attr('x', function (d, i) {
+          return i * (svgWidth / frequencyData.length);
+        })
+        .attr('width', svgWidth / frequencyData.length - barPadding)
         .attr('y', function(d) {
-          d = Math.max((d/255)*svgHeight, 3);
-           return svgHeight-d;
+        d = Math.max((d/255)*svgHeight, 3);
+         return svgHeight-d;
         })
         .attr('height', function(d) {
-          d = Math.max((d/255)*svgHeight, 3);
-           return d;
+        d = Math.max((d/255)*svgHeight, 3)
+          return d;
         })
-        .attr('fill', function(d, i) {
-            d = Math.max((d/255)*svgHeight, 3);
-            if ((i/256) < (songPlayer.audio.currentTime/songPlayer.audio.duration)) {
-              return 'rgb(66,133,244)';              
-            } else {
-              return 'rgba(255,135,50, 0.35)'
-            }
-        });
+      .attr('fill', function(d, i) {
+          d = Math.max((d/255)*svgHeight, 3);
+          if ((i/256) < (songPlayer.audio.currentTime/songPlayer.audio.duration)) {
+            return 'rgb(66,133,244)';              
+          } else {
+            return 'rgba(255,135,50, 0.35)'
+          }
+      });
   }
   // Run the loop
   renderChart();
 };
+
+})();
+
+
 
 
 
