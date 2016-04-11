@@ -311,6 +311,7 @@ var songPlayer = {
     next_id: null,
     audioSrc: null,
     audioCtx: null,
+    animation_id: null,
     playNew: function(song) {
         this.associate();
         if (this.audio) this.audio.pause();
@@ -614,6 +615,7 @@ var clearVisualizer = function() {
 
 var visualizer = function(new_song) {
 	if (new_song) {
+		window.cancelAnimationFrame(songPlayer.animation_id);
 		songPlayer.audioCtx = new(window.AudioContext || window.webkitAudioContext)();
 		songPlayer.audioSrc = songPlayer.audioCtx.createMediaElementSource(songPlayer.audio);
 		songPlayer.analyser = songPlayer.audioCtx.createAnalyser();
@@ -622,7 +624,13 @@ var visualizer = function(new_song) {
 		songPlayer.audioSrc.connect(songPlayer.analyser);
 		songPlayer.audioSrc.connect(songPlayer.audioCtx.destination);		
 	}
+
+
 	var song_id = songPlayer.soundcloud_id;
+	if (!document.getElementById('player_'+song_id)) {
+		window.clearAnimationFrame(songPlayer.animation_id);
+		return;
+	}
 
 	//var frequencyData = new Uint8Array(songPlayer.analyser.frequencyBinCount);
 	var frequencyData = new Uint8Array(512);
@@ -648,8 +656,8 @@ var visualizer = function(new_song) {
 
 	// Continuously loop and update chart with frequency data.
 	function renderChart() {
-	    window.requestAnimationFrame(renderChart);
-
+	    songPlayer.animation_id = window.requestAnimationFrame(renderChart);
+	    console.log("Test");
 	    // Copy frequency data to frequencyData array.
 	    songPlayer.analyser.getByteFrequencyData(frequencyData);
 
@@ -682,6 +690,9 @@ var visualizer = function(new_song) {
 	}
 	// Run the loop
 	renderChart();
+	setTimeout(function() {
+		window.cancelAnimationFrame(songPlayer.animation_id);
+	}, 5000);
 };
 
 })();
