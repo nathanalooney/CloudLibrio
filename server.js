@@ -5,12 +5,9 @@ var app = express();
 
 process.env.PWD = process.cwd();
 
-
-var COMMENTS_FILE = path.join(__dirname, 'comments.json');
-
 app.set('port', (process.env.PORT || 3000));
 
-app.use('/', express.static(path.join(process.env.PWD, 'public')));
+app.use(express.static(path.join(process.env.PWD, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
