@@ -8,8 +8,8 @@
     "start": "node server.js"
   },
   "engines": {
-    "node": "0.10.11",
-    "npm": "1.2.25"
+    "node": "5.5.0",
+    "npm": "3.3.12"
   },
   "author": "Nathan A. Looney",
   "license": "ISC",
