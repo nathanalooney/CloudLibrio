@@ -435,7 +435,7 @@ var songPlayer = {
 var loadLibrary = function() {
     var client_id = 'client_id=96089e67110795b69a95705f38952d8f'
     $('#main').html('<p id="load-status"> Loading Your Full Library </p>');
-    $.get('http://api.soundcloud.com/users/'+songPlayer.user_id+'/favorites?' + client_id + '&limit=200&linked_partitioning=1', function(response) {
+    $.get('https://api.soundcloud.com/users/'+songPlayer.user_id+'/favorites?' + client_id + '&limit=200&linked_partitioning=1', function(response) {
         responseList.push(response.collection);
         buildLibrary(response.next_href);
         $('#load-status').text('Loading Your Full Library (' + response.collection.length + ' songs)');
@@ -482,7 +482,7 @@ var combineLists = function() {
 
 var loadPlaylists = function() {
     var client_id = '96089e67110795b69a95705f38952d8f'
-    $.get('http://api.soundcloud.com/users/'+songPlayer.user_id+'/playlists?client_id=' + client_id, function(response) {
+    $.get('https://api.soundcloud.com/users/'+songPlayer.user_id+'/playlists?client_id=' + client_id, function(response) {
         response.forEach(function(playlist) {
             $('#main').append('<h1>' + playlist.title + '</h1>');
             playlist.tracks.forEach(function(song) {
@@ -691,7 +691,7 @@ var visualizer = function(new_song) {
     renderChart();
 };
 // client_id: '96089e67110795b69a95705f38952d8f'
-// redirect_uri: 'http://sclibrary.testing.com:3000/callback.html'
+// redirect_uri: 'https://sclibrary.testing.com:3000/callback.html'
 
 $('#user-select').on('click', function () {
     $('#overlay, #overlay-back').fadeIn(500);
@@ -708,7 +708,7 @@ $('#signin-submit').on('click', function() {
 
 var authenticateUsername = function(username) {
     console.log(username);
-    var url = 'http://api.soundcloud.com/resolve?url=https://soundcloud.com/'+username+'&client_id=96089e67110795b69a95705f38952d8f';
+    var url = 'https://api.soundcloud.com/resolve?url=https://soundcloud.com/'+username+'&client_id=96089e67110795b69a95705f38952d8f';
     $.get(url)
     .success(function(data) {
         console.log(data.id);
