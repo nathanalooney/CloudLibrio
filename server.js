@@ -7,7 +7,7 @@ process.env.PWD = process.cwd();
 
 app.set('port', (process.env.PORT || 3000));
 
-app.use(express.static(path.join(process.env.PWD, 'public')));
+app.use(express.static(path.join(process.env.PWD, '/public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
