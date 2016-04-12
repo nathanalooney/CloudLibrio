@@ -12,6 +12,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 
-app.listen(app.get('port'), function() {
+app.listen(app.get('port'), '0.0.0.0', function() {
   console.log('Server started: http://localhost:' + app.get('port') + '/');
 });
