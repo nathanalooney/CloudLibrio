@@ -58,31 +58,6 @@ var Song = React.createClass({
 		this.props.playSong(this.props.song);
 	},
     registerClick: function(event) {
-
-    // function getPosition(el) {
-    //   var xPosition = 0;
-    //   var yPosition = 0;
-     
-    //   while (el) {
-    //     if (el.tagName == "BODY") {
-    //       // deal with browser quirks with body/window/document and page scroll
-    //       var xScrollPos = el.scrollLeft || document.documentElement.scrollLeft;
-    //       var yScrollPos = el.scrollTop || document.documentElement.scrollTop;
-     
-    //       xPosition += (el.offsetLeft - xScrollPos + el.clientLeft);
-    //       yPosition += (el.offsetTop - yScrollPos + el.clientTop);
-    //     } else {
-    //       xPosition += (el.offsetLeft - el.scrollLeft + el.clientLeft);
-    //       yPosition += (el.offsetTop - el.scrollTop + el.clientTop);
-    //     }
-     
-    //     el = el.offsetParent;
-    //   }
-    //   return {
-    //     x: xPosition,
-    //     y: yPosition
-    //   };
-    // }
     var div = ReactDOM.findDOMNode(this)
     var svg = div.querySelector('svg')
     var rect = svg.getBoundingClientRect();
@@ -442,7 +417,12 @@ var loadLibrary = function() {
     var client_id = 'client_id=96089e67110795b69a95705f38952d8f'
     $('#main').html('<p id="load-status"> Loading Your Full Library </p>');
     $.get('https://api.soundcloud.com/users/'+songPlayer.user_id+'/favorites?' + client_id + '&limit=200&linked_partitioning=1', function(response) {
-        responseList.push(response.collection);
+        try {
+            var collection = JSON.parse(response.collection);
+        } catch(e) {
+            var collection = response.collection
+        }
+        responseList.push(collection);
         buildLibrary(response.next_href);
         $('#load-status').text('Loading Your Full Library (' + response.collection.length + ' songs)');
     });
@@ -452,7 +432,12 @@ var loadLibrary = function() {
 var buildLibrary = function(next_href) {
     $.get(next_href).then(function(response) {
         console.log("Still loading...");
-        responseList.push(response.collection);
+        try {
+            var collection = JSON.parse(response.collection);
+        } catch(e) {
+            var collection = response.collection
+        }
+        responseList.push(collection);
         if (response.next_href) {
             var loadedCount = 0;
             responseList.forEach(function(collection) {
@@ -713,7 +698,7 @@ $('#signin-submit').on('click', function() {
 
 
 var authenticateUsername = function(username) {
-    console.log(username);
+
     var url = 'https://api.soundcloud.com/resolve?url=https://soundcloud.com/'+String(username)+'&client_id=96089e67110795b69a95705f38952d8f';
     console.log(url);
     $.get(url)
@@ -726,6 +711,8 @@ var authenticateUsername = function(username) {
         songPlayer.user_id = data.id;
         localStorage.clear();
         localStorage.setItem("soundcloud_user_id", data.id);
+        localStorage.setItem("soundcloud_user_name", data.name);
+        if (songPlayer.audio) songPlayer.pause();
         startLibrary();
     })
     .fail(function(error) {
@@ -738,6 +725,7 @@ $(document).ready(function() {
     var user_id = localStorage.getItem("soundcloud_user_id");
     if (user_id) {
         songPlayer.user_id = user_id;
+        document.getElementById('user-select').innerHTML = localStorage.getItem('soundcloud_user_name');
         startLibrary(); 
     } else {
         document.getElementById('overlay-back').style.display = 'block';
