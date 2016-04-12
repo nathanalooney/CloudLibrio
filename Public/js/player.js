@@ -57,36 +57,42 @@ var Song = React.createClass({
 	playSong: function() {
 		this.props.playSong(this.props.song);
 	},
-  registerClick: function(event) {
+    registerClick: function(event) {
 
-    function getPosition(el) {
-      var xPosition = 0;
-      var yPosition = 0;
+    // function getPosition(el) {
+    //   var xPosition = 0;
+    //   var yPosition = 0;
      
-      while (el) {
-        if (el.tagName == "BODY") {
-          // deal with browser quirks with body/window/document and page scroll
-          var xScrollPos = el.scrollLeft || document.documentElement.scrollLeft;
-          var yScrollPos = el.scrollTop || document.documentElement.scrollTop;
+    //   while (el) {
+    //     if (el.tagName == "BODY") {
+    //       // deal with browser quirks with body/window/document and page scroll
+    //       var xScrollPos = el.scrollLeft || document.documentElement.scrollLeft;
+    //       var yScrollPos = el.scrollTop || document.documentElement.scrollTop;
      
-          xPosition += (el.offsetLeft - xScrollPos + el.clientLeft);
-          yPosition += (el.offsetTop - yScrollPos + el.clientTop);
-        } else {
-          xPosition += (el.offsetLeft - el.scrollLeft + el.clientLeft);
-          yPosition += (el.offsetTop - el.scrollTop + el.clientTop);
-        }
+    //       xPosition += (el.offsetLeft - xScrollPos + el.clientLeft);
+    //       yPosition += (el.offsetTop - yScrollPos + el.clientTop);
+    //     } else {
+    //       xPosition += (el.offsetLeft - el.scrollLeft + el.clientLeft);
+    //       yPosition += (el.offsetTop - el.scrollTop + el.clientTop);
+    //     }
      
-        el = el.offsetParent;
-      }
-      return {
-        x: xPosition,
-        y: yPosition
-      };
-    }
+    //     el = el.offsetParent;
+    //   }
+    //   return {
+    //     x: xPosition,
+    //     y: yPosition
+    //   };
+    // }
     var div = ReactDOM.findDOMNode(this)
     var svg = div.querySelector('svg')
-    var posX = getPosition(svg);
-    songPlayer.audio.currentTime = Math.floor((((event.clientX - posX.x)/div.offsetWidth)*songPlayer.audio.duration))
+    var rect = svg.getBoundingClientRect();
+    var left = rect.x || rect.left;
+    var width = rect.width;
+    var percentage = ((event.clientX - left)/width);
+    var time = parseFloat(Math.floor((percentage*songPlayer.audio.duration)))
+    console.log(event.clientX, rect, rect.x, rect.width);
+
+    songPlayer.audio.currentTime = time;
   },
 	render: function() {
     	var is_current_song = (this.props.soundcloud_id === this.props.song.id);
@@ -708,10 +714,15 @@ $('#signin-submit').on('click', function() {
 
 var authenticateUsername = function(username) {
     console.log(username);
-    var url = 'https://api.soundcloud.com/resolve?url=https://soundcloud.com/'+username+'&client_id=96089e67110795b69a95705f38952d8f';
+    var url = 'https://api.soundcloud.com/resolve?url=https://soundcloud.com/'+String(username)+'&client_id=96089e67110795b69a95705f38952d8f';
+    console.log(url);
     $.get(url)
     .success(function(data) {
-        console.log(data.id);
+        try {
+            data = JSON.parse(data);            
+        } catch(e) {
+            console.log(e);
+        }
         songPlayer.user_id = data.id;
         localStorage.clear();
         localStorage.setItem("soundcloud_user_id", data.id);
