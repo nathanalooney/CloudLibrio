@@ -29,9 +29,6 @@
 				width: 100%;
 				z-index: 1;
 			}
-			.header {
-
-			}
 		    #player{
 		    	position: fixed;
 		    	background-color: #4285f4;
@@ -47,6 +44,8 @@
 		    }
 			body {
 				font-family: 'Roboto', sans-serif;
+			    width  : 100%;
+			    height : 100%;
 			}
 			.glyphicon {
 				color: #FF8732;
@@ -77,50 +76,127 @@
 				display: inline-block;
 				float: right;
 			}
+			#user-select {
+				display: inline-block;
+				float: right;
+			}
+			#overlay-back {
+			    position   : absolute;
+			    top        : 0;
+			    left       : 0;
+			    width      : 110%;
+			    height     : 110%;
+			    background : #000;
+			    opacity    : 0.6;
+			    filter     : alpha(opacity=60);
+			    z-index    : 5;
+			    display    : none;
+			}
+
+			#overlay {
+			    position : absolute;
+			    top      : 0;
+			    left     : 0;
+			    width    : 100%;
+			    height   : 100%;
+			    z-index  : 10;
+			    display  : none;
+			    color: #ffffff;
+			} 
+			.stop-scrolling {
+			  height: 100%;
+			  overflow: hidden;
+			}
+			#signin {
+				width:500px;
+				height:200px;
+				position:absolute;
+				left:50%;
+				top:50%;
+				margin:-100px 0 0 -150px;
+			}
+			#signin-field {
+				display: inline-block;
+				background: transparent;
+				border: none;
+				padding-left: 10px;
+			}
+			#signin-label {
+				display: inline-block;
+				padding-right: 10px;
+			}
+			#signin-submit {
+				display: inline-block;
+				background: transparent;
+				border: none;
+			}
 	    </style>
     </head>
   	<body>
-	  		<div id="header-container">
-		  		<div class="row">
-			  		<div class="col-md-1"></div>
-			  		<div class="col-md-10">
-					</div>
-					<div class="col-md-1"></div>
+		<div id="overlay-back"></div>
+		<div id="overlay">
+			<span>
+				<div id="signin"> 
+					<p id="signin-label">Soundcloud Username: </p>
+					<input id="signin-field" type="text">
+					<input id="signin-submit" type="submit">
 				</div>
-		  		<div class="row">
-			  		<div class="col-md-1"></div>
-			  		<div class="col-md-10">
-				  		<h1 class="header" style="text-align: center;"> SCLibrary </h1>
-					</div>
-					<div class="col-md-1"></div>
+			</span>
+		</div> 
+  		<div id="header-container">
+	  		<div class="row">
+		  		<div class="col-md-1"></div>
+		  		<div class="col-md-8">
 				</div>
-		  		<div class="row">
-			  		<div class="col-md-1"></div>
-			  		<div class="col-md-10" style="text-align: center;">
-				  		<p id="sort-date" class="sort-button" sort="descending"> Date </p>
-				  		<p id="sort-title" class="sort-button" sort="descending"> Title </p>
-				  		<p id="sort-artist" class="sort-button" sort="descending"> Artist </p>
-				  		<p id="sort-favorites" class="sort-button" sort="descending"> Likes </p>
-				  		<p id="sort-plays" class="sort-button" sort="descending"> Plays </p>
-				  		<p id="shuffle" class="sort-button" sort="descending"> Shuffle </p>
-				  		<label> Remixes: <input id="remixes" type="checkbox" checked></label>
-				  		<label> Originals: <input id="originals" type="checkbox" checked></label>
-				  		<p id="refresh" class="sort-button" sort="descending"> Refresh </p>
-				  		<p id="play_prev" class="sort-button"> Prev </p>
-				  		<p id="play_next" class="sort-button"> Next </p>
-					</div>
-					<div class="col-md-1"></div>
-				</div>
-		  		<div class="row">
-			  		<div class="col-md-1"></div>
-			  		<div class="col-md-10">
-			  			<div class="form-group">
-			  				<input type="search" class="form-control" id="searchbar" placeholder="Search...">
-			  			</div>
-					</div>
-					<div class="col-md-1"></div>
-				</div>
+				<div class="col-md-3" > <p id="user-select"> lnymsc </p></div>
 			</div>
+	  		<div class="row">
+		  		<div class="col-md-1"></div>
+		  		<div class="col-md-10">
+			  		<h1 class="header" style="text-align: center;"> SCLibrary </h1>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
+			<script>
+
+				$('#user-select').on('click', function () {
+				    $('#overlay, #overlay-back').fadeIn(500);
+				    $('body').addClass('stop-scrolling');
+				});
+				$('#signin-submit').on('click', function() {
+				    $('#overlay, #overlay-back').fadeOut(500);
+				    $('body').removeClass('stop-scrolling');
+				    $('#user-select').html(document.getElementById('signin-field').value);				
+				})
+
+			</script>
+	  		<div class="row">
+		  		<div class="col-md-1"></div>
+		  		<div class="col-md-10" style="text-align: center;">
+			  		<p id="sort-date" class="sort-button" sort="descending"> Date </p>
+			  		<p id="sort-title" class="sort-button" sort="descending"> Title </p>
+			  		<p id="sort-artist" class="sort-button" sort="descending"> Artist </p>
+			  		<p id="sort-favorites" class="sort-button" sort="descending"> Likes </p>
+			  		<p id="sort-plays" class="sort-button" sort="descending"> Plays </p>
+			  		<p id="shuffle" class="sort-button" sort="descending"> Shuffle </p>
+			  		<label> Remixes: <input id="remixes" type="checkbox" checked></label>
+			  		<label> Originals: <input id="originals" type="checkbox" checked></label>
+			  		<p id="refresh" class="sort-button" sort="descending"> Refresh </p>
+			  		<p id="play_prev" class="sort-button"> Prev </p>
+			  		<p id="play_next" class="sort-button"> Next </p>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
+	  		<div class="row">
+		  		<div class="col-md-1"></div>
+		  		<div class="col-md-10">
+		  			<div class="form-group">
+		  				<input type="search" class="form-control" id="searchbar" placeholder="Search...">
+		  			</div>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
+		</div>
 		<div class="row">
 	  		<div class="col-md-1"></div>
 	  		<div class="col-md-10">
@@ -132,7 +208,5 @@
 	  		<div class="col-md-12" id="player"> </div>
 		</div>
   	</body>
-
 	<script src="/js/player.js" type="text/babel"></script>
-
 </html>
