@@ -76,19 +76,17 @@ var Song = React.createClass({
 		var currTime = "0:00"
 		return (
 			<div>
-        <span className={glyph_class} onClick={this.playSong}></span>
-          <div className={"song-info-container"}> 
+                <span className={glyph_class} onClick={this.playSong}></span>
+                <div className={"song-info-container"}> 
   				  <h3> {this.props.song.user.username} </h3>
   				  <p> {this.props.song.title} </p>
-          </div>
-        <div id={'player_'+this.props.song.id} onClick={this.registerClick}></div>
-        	{is_current_song ? <div><p id={"current-time-"+this.props.song.id}>0:00</p><p id="duration"> {songPlayer.millisToMinutesAndSeconds(this.props.song.duration)}</p></div> : null}
+                </div>
+                <div id={'player_'+this.props.song.id} onClick={this.registerClick}></div>
+        	   {is_current_song ? <div><div id={"current-time-"+this.props.song.id}>{'0:00'}</div><div id="duration"> {songPlayer.millisToMinutesAndSeconds(this.props.song.duration)}</div></div> : null}
 		</div>
 		);
 	}
 });
-
-
 
 
 
@@ -696,36 +694,46 @@ $('#signin-submit').on('click', function() {
     authenticateUsername(username);          
 })
 
+var clearLocalData = function() {
+    fullLibrary = []
+    responseList = [];
+    localStorage.clear();
+}
 
 var authenticateUsername = function(username) {
-
+    clearLocalData();
     var url = 'https://api.soundcloud.com/resolve?url=https://soundcloud.com/'+String(username)+'&client_id=96089e67110795b69a95705f38952d8f';
     console.log(url);
-    $.get(url)
-    .success(function(data) {
-        try {
-            data = JSON.parse(data);            
-        } catch(e) {
-            console.log(e);
-        }
-        songPlayer.user_id = data.id;
-        localStorage.clear();
-        localStorage.setItem("soundcloud_user_id", data.id);
-        localStorage.setItem("soundcloud_user_name", data.name);
-        if (songPlayer.audio) songPlayer.pause();
-        startLibrary();
-    })
-    .fail(function(error) {
-        console.log('Username Doesn\'t Exist');
-    });
-
+        $.get({
+            url: url,
+            dataType: 'json'
+        })
+        .success(function(data, status) {
+            try {
+                data = JSON.parse(data);            
+            } catch(e) {
+                console.log(e);
+            }
+            console.log(data);
+            songPlayer.user_id = data.id;
+            localStorage.clear();
+            localStorage.setItem("soundcloud_user_id", data.id);
+            localStorage.setItem("soundcloud_user_name", data.permalink);
+            document.getElementById('user-select').innerHTML = data.permalink;
+            if (songPlayer.audio) songPlayer.pause();
+            startLibrary();
+        })
+        .fail(function(data, status) {
+            console.log(data, status);
+        });
 }
 //Kick off the site.
 $(document).ready(function() {
     var user_id = localStorage.getItem("soundcloud_user_id");
-    if (user_id) {
+    var user_name = localStorage.getItem("soundcloud_user_name");
+    if (user_id && user_name) {
         songPlayer.user_id = user_id;
-        document.getElementById('user-select').innerHTML = localStorage.getItem('soundcloud_user_name');
+        document.getElementById('user-select').innerHTML = user_name;
         startLibrary(); 
     } else {
         document.getElementById('overlay-back').style.display = 'block';
