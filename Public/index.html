@@ -40,7 +40,7 @@
 		    #main {
 		    	background-color: #ffffff;
 		    	height: 100%;
-		    	margin-top: 180px;
+		    	margin-top: 60px;
 		    }
 			body {
 				font-family: 'Roboto', sans-serif;
@@ -72,14 +72,12 @@
 				display: inline-block;
 				padding-left: 20px;
 			}
-			#current-time {
+			.current-time {
 				display: inline-block;
-				vertical-align: bottom;
 			}
-			#duration {
+			.duration {
 				display: inline-block;
 				float: right;
-				vertical-align: bottom;
 			}
 			#user-select {
 				display: inline-block;
@@ -136,6 +134,26 @@
 				background: transparent;
 				border: none;
 			}
+			#searchbar , #searchbar:focus {
+				display: inline-block;
+				margin-top: 10px;
+				margin-bottom: 10px;
+				background: transparent;
+				border: none;
+				color: white;
+				box-shadow: none;
+			}
+			#logo {
+				padding: 10px;
+				text-align: center;
+			}
+			#header-buttons {
+				display: inline-block;
+			}
+			#search-container {
+				display: inline-block;
+				float: none;
+			}
 	    </style>
     </head>
   	<body>
@@ -151,53 +169,32 @@
 		</div> 
   		<div id="header-container">
 	  		<div class="row">
-		  		<div class="col-md-1"></div>
-		  		<div class="col-md-8">
-				</div>
-				<div class="col-md-3" > <p id="user-select"> Username </p></div>
-			</div>
-	  		<div class="row">
-		  		<div class="col-md-1"></div>
+		  		<div class="col-md-1" id="logo"> <p> SCLibrary </p> </div>
 		  		<div class="col-md-10">
-			  		<h1 class="header" style="text-align: center;"> SCLibrary </h1>
-				</div>
-				<div class="col-md-1"></div>
-			</div>
-			<script>
-
-
-			</script>
-	  		<div class="row">
-		  		<div class="col-md-1"></div>
-		  		<div class="col-md-10" style="text-align: center;">
-			  		<p id="sort-date" class="sort-button" sort="descending"> Date </p>
-			  		<p id="sort-title" class="sort-button" sort="descending"> Title </p>
-			  		<p id="sort-artist" class="sort-button" sort="descending"> Artist </p>
-			  		<p id="sort-favorites" class="sort-button" sort="descending"> Likes </p>
-			  		<p id="sort-plays" class="sort-button" sort="descending"> Plays </p>
-			  		<p id="shuffle" class="sort-button" sort="descending"> Shuffle </p>
-			  		<label> Remixes: <input id="remixes" type="checkbox" checked></label>
-			  		<label> Originals: <input id="originals" type="checkbox" checked></label>
-			  		<p id="refresh" class="sort-button" sort="descending"> Refresh </p>
-			  		<p id="play_prev" class="sort-button"> Prev </p>
-			  		<p id="play_next" class="sort-button"> Next </p>
-				</div>
-				<div class="col-md-1"></div>
-			</div>
-	  		<div class="row">
-		  		<div class="col-md-1"></div>
-		  		<div class="col-md-10">
-		  			<div class="form-group">
+		  			<div id="header-buttons">
+				  		<p id="sort-date" class="sort-button" sort="descending"> Date </p>
+				  		<p id="sort-title" class="sort-button" sort="descending"> Title </p>
+				  		<p id="sort-artist" class="sort-button" sort="descending"> Artist </p>
+				  		<p id="sort-favorites" class="sort-button" sort="descending"> Likes </p>
+				  		<p id="sort-plays" class="sort-button" sort="descending"> Plays </p>
+				  		<p id="shuffle" class="sort-button" sort="descending"> Shuffle </p>
+				  		<label> Remixes: <input id="remixes" type="checkbox" checked></label>
+				  		<label> Originals: <input id="originals" type="checkbox" checked></label>
+				  		<p id="refresh" class="sort-button" sort="descending"> Refresh </p>
+				  		<p id="play_prev" class="sort-button"> Prev </p>
+				  		<p id="play_next" class="sort-button"> Next </p>
+			  		</div>
+		  			<div id="search-container">
 		  				<input type="search" class="form-control" id="searchbar" placeholder="Search...">
 		  			</div>
 				</div>
-				<div class="col-md-1"></div>
+				<div class="col-md-1"><p id="user-select"> Username </p></div>
 			</div>
 		</div>
 		<div class="row">
 	  		<div class="col-md-1"></div>
 	  		<div class="col-md-10">
-	  			<div id="main"><div id="svg"></div></div>
+	  			<div id="main"></div>
 			</div>
 			<div class="col-md-1"></div>
 		</div>

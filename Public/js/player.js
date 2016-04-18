@@ -58,17 +58,17 @@ var Song = React.createClass({
 		this.props.playSong(this.props.song);
 	},
     registerClick: function(event) {
-    var div = ReactDOM.findDOMNode(this)
-    var svg = div.querySelector('svg')
-    var rect = svg.getBoundingClientRect();
-    var left = rect.x || rect.left;
-    var width = rect.width;
-    var percentage = ((event.clientX - left)/width);
-    var time = parseFloat(Math.floor((percentage*songPlayer.audio.duration)))
-    console.log(event.clientX, rect, rect.x, rect.width);
+        var div = ReactDOM.findDOMNode(this)
+        var svg = div.querySelector('svg')
+        var rect = svg.getBoundingClientRect();
+        var left = rect.x || rect.left;
+        var width = rect.width;
+        var percentage = ((event.clientX - left)/width);
+        var time = parseFloat(Math.floor((percentage*songPlayer.audio.duration)))
+        console.log(event.clientX, rect, rect.x, rect.width);
 
-    songPlayer.audio.currentTime = time;
-  },
+        songPlayer.audio.currentTime = time;
+      },
 	render: function() {
     	var is_current_song = (this.props.soundcloud_id === this.props.song.id);
 		var glyph = (is_current_song && !this.props.isPaused) ? "pause" : "play-circle";
@@ -82,7 +82,7 @@ var Song = React.createClass({
   				  <p> {this.props.song.title} </p>
                 </div>
                 <div id={'player_'+this.props.song.id} onClick={this.registerClick}></div>
-        	   {is_current_song ? <div><div id={"current-time-"+this.props.song.id}>{'0:00'}</div><div id="duration"> {songPlayer.millisToMinutesAndSeconds(this.props.song.duration)}</div></div> : null}
+        	   {is_current_song ? <div><div className={"current-time"} id={"current-time-"+this.props.song.id}>{'0:00'}</div><div className={"duration"} id={"duration"+this.props.song.id}> {songPlayer.millisToMinutesAndSeconds(this.props.song.duration)}</div></div> : null}
 		</div>
 		);
 	}
