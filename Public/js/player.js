@@ -146,7 +146,7 @@ var filterLibrary = function(library) {
 
         var title = song.title.toLowerCase();
         var user = song.user.username.toLowerCase();
-        var term = $('#searchbar').val().toLowerCase();
+        var term = document.getElementById('searchbar').value;
         if (term.length > 0) {
             if (title.indexOf(term) > -1 || user.toLowerCase().indexOf(term) > -1) {
                 var isRemix = false;
@@ -260,18 +260,18 @@ var sortPlays = function(a, b) {
 }
 
 var shuffle = function(library) {
-        var currentIndex = library.length,
-            temporaryValue, randomIndex;
-        while (currentIndex !== 0) {
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex -= 1;
+    var currentIndex = library.length,
+        temporaryValue, randomIndex;
+    while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
 
-            temporaryValue = library[currentIndex];
-            library[currentIndex] = library[randomIndex];
-            library[randomIndex] = temporaryValue;
-        }
-        return library;
+        temporaryValue = library[currentIndex];
+        library[currentIndex] = library[randomIndex];
+        library[randomIndex] = temporaryValue;
     }
+    return library;
+}
     //----------------------------------------------------------------------------------------------------//
 
 var fullLibrary = [];
@@ -411,6 +411,40 @@ var songPlayer = {
     }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 var loadLibrary = function() {
     var client_id = 'client_id=96089e67110795b69a95705f38952d8f'
     $('#main').html('<p id="load-status"> Loading Your Full Library </p>');
@@ -458,7 +492,22 @@ var combineLists = function() {
         fullLibrary = fullLibrary.concat(responseList[i])
     }
     for (var i = 0; i < fullLibrary.length; i++) {
-        fullLibrary[i].sclibrary_id = i;
+        var trimmedSong = {
+            duration: fullLibrary[i].duration,
+            favoritings_count: fullLibrary[i].favoritings_count,
+            id: fullLibrary[i].id,
+            permalink_url: fullLibrary[i].permalink_url,
+            playback_count: fullLibrary[i].playback_count,
+            stream_url: fullLibrary[i].stream_url,
+            title: fullLibrary[i].title,
+            uri: fullLibrary[i].uri,
+            user: {
+                id: fullLibrary[i].user.id,
+                username: fullLibrary[i].user.username,
+            },
+            sclibrary_id: i
+        }
+        fullLibrary[i] = trimmedSong
     }
     console.log('Setting localstorage..');
     console.log(fullLibrary);
@@ -481,6 +530,32 @@ var loadPlaylists = function() {
         })
     });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //-------------------------------------------------------------------------------------------------------//
 var toggle = function(button) {
@@ -733,7 +808,7 @@ $(document).ready(function() {
     var user_name = localStorage.getItem("soundcloud_user_name");
     if (user_id && user_name) {
         songPlayer.user_id = user_id;
-        document.getElementById('user-select').innerHTML = user_name;
+        document.getElementById('change-user').innerHTML = user_name;
         startLibrary(); 
     } else {
         document.getElementById('overlay-back').style.display = 'block';

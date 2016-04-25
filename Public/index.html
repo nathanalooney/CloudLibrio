@@ -1,163 +1,158 @@
 <!DOCTYPE HTML>
 <html lang="en">
-	<head>
-		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=320, height=device-height, target-densitydpi=medium-dpi" />
 
-		<script src="https://code.jquery.com/jquery-2.2.1.min.js" integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00=" crossorigin="anonymous"></script>
-		<!-- React -->
-		<script src="/js/react.js"></script>
-		<script src="/js/react-dom.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
-		<!-- Soundcloud -->
-		<script src="https://connect.soundcloud.com/sdk/sdk-3.0.0.js"></script>
-		<!-- Bootstrap -->
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>		
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-		<!-- WebApp Code -->
+	<script src="https://code.jquery.com/jquery-2.2.1.min.js" integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00=" crossorigin="anonymous"></script>
+	<!-- React -->
+	<script src="/js/react.js"></script>
+	<script src="/js/react-dom.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+	<!-- Soundcloud -->
+	<script src="https://connect.soundcloud.com/sdk/sdk-3.0.0.js"></script>
+	<!-- Bootstrap -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>		
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<!-- WebApp Code -->
 
-		<!-- Font -->
-		<link href='https://fonts.googleapis.com/css?family=Roboto:100' rel='stylesheet' type='text/css'>
+	<!-- Font -->
+	<link href='https://fonts.googleapis.com/css?family=Roboto:100' rel='stylesheet' type='text/css'>
 
-		<!-- D3 -->
-		<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-	    <style>
-			#header-container {
-				background-color: #4285f4;
-				box-shadow: 0 0 4px rgba(0,0,0,.14),0 4px 8px rgba(0,0,0,.28);
-				color: #ffffff;
-				position: fixed;
-				width: 100%;
-				z-index: 1;
-			}
-		    #player{
-		    	position: fixed;
-		    	background-color: #4285f4;
-		    	left: 0px;
-		    	bottom: 0px;
-		    	width: 100%;
-		    	color: #ffffff;
-		    }
-		    #main {
-		    	background-color: #ffffff;
-		    	height: 100%;
-		    	margin-top: 60px;
-		    }
-			body {
-				font-family: 'Roboto', sans-serif;
-			    width  : 100%;
-			    height : 100%;
-			}
-			.glyphicon {
-				color: #FF8732;
-			}
-			.glyphicon-play-circle{
-				font-size: 4em;
-				cursor: pointer;
-			}
-			.glyphicon-pause{
-				font-size: 4em;
-				cursor: pointer;
-			}
-			html {
-				width: 100%;
-				height: 100%;
-				background: url(ripple.gif) center center no-repeat;
-			}
-			.sort-button {
-				display: inline;
-				padding: 10px;
-				cursor: pointer;
-			}
-			.song-info-container {
-				display: inline-block;
-				padding-left: 20px;
-			}
-			.current-time {
-				display: inline-block;
-			}
-			.duration {
-				display: inline-block;
-				float: right;
-			}
-			#user-select {
-				display: inline-block;
-				float: right;
-				cursor: pointer;
-			}
-			#overlay-back {
-			    position   : absolute;
-			    top        : 0;
-			    left       : 0;
-			    width      : 110%;
-			    height     : 110%;
-			    background : #000;
-			    opacity    : 0.6;
-			    filter     : alpha(opacity=60);
-			    z-index    : 5;
-			    display    : none;
-			}
+	<!-- D3 -->
+	<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
-			#overlay {
-			    position : absolute;
-			    top      : 0;
-			    left     : 0;
-			    width    : 100%;
-			    height   : 100%;
-			    z-index  : 10;
-			    display  : none;
-			    color: #ffffff;
-			} 
-			.stop-scrolling {
-			  height: 100%;
-			  overflow: hidden;
-			}
-			#signin {
-				width:500px;
-				height:200px;
-				position:absolute;
-				left:50%;
-				top:50%;
-				margin:-100px 0 0 -150px;
-			}
-			#signin-field {
-				display: inline-block;
-				background: transparent;
-				border: none;
-				padding-left: 10px;
-			}
-			#signin-label {
-				display: inline-block;
-				padding-right: 10px;
-			}
-			#signin-submit {
-				display: inline-block;
-				background: transparent;
-				border: none;
-			}
-			#searchbar , #searchbar:focus {
-				display: inline-block;
-				margin-top: 10px;
-				margin-bottom: 10px;
-				background: transparent;
-				border: none;
-				color: white;
-				box-shadow: none;
-			}
-			#logo {
-				padding: 10px;
-				text-align: center;
-			}
-			#header-buttons {
-				display: inline-block;
-			}
-			#search-container {
-				display: inline-block;
-				float: none;
-			}
-	    </style>
-    </head>
-  	<body>
-		<div id="overlay-back"></div>
+    <style>
+	    #player{
+	    	position: fixed;
+	    	background-color: #4285f4;
+	    	left: 0px;
+	    	bottom: 0px;
+	    	width: 100%;
+	    	color: #ffffff;
+	    }
+	    #main {
+	    	background-color: #ffffff;
+	    	height: 100%;
+	    }
+		body {
+			font-family: 'Roboto', sans-serif;
+		    width  : 100%;
+		    height : 100%;
+		}
+		#main .glyphicon {
+			color: #FF8732;
+		}
+		#main .glyphicon-play-circle{
+			font-size: 4em;
+			cursor: pointer;
+		}
+		#main .glyphicon-pause{
+			font-size: 4em;
+			cursor: pointer;
+		}
+		html {
+			width: 100%;
+			height: 100%;
+			background: url(ripple.gif) center center no-repeat;
+		}
+		.song-info-container {
+			display: inline-block;
+			padding-left: 20px;
+		}
+		.current-time {
+			display: inline-block;
+		}
+		.duration {
+			display: inline-block;
+			float: right;
+		}
+		#overlay-back {
+		    position   : absolute;
+		    top        : 0;
+		    left       : 0;
+		    width      : 110%;
+		    height     : 110%;
+		    background : #000;
+		    opacity    : 0.6;
+		    filter     : alpha(opacity=60);
+		    z-index    : 5;
+		    display    : none;
+		}
+		#overlay {
+		    position : absolute;
+		    top      : 0;
+		    left     : 0;
+		    width    : 100%;
+		    height   : 100%;
+		    z-index  : 10;
+		    display  : none;
+		    color: #ffffff;
+		} 
+		.stop-scrolling {
+		  height: 100%;
+		  overflow: hidden;
+		}
+		#signin {
+			width:500px;
+			height:200px;
+			position:absolute;
+			left:50%;
+			top:50%;
+			margin:-100px 0 0 -150px;
+		}
+		#signin-field {
+			display: inline-block;
+			background: transparent;
+			border: none;
+			padding-left: 10px;
+		}
+		#signin-label {
+			display: inline-block;
+			padding-right: 10px;
+		}
+		#signin-submit {
+			display: inline-block;
+			background: transparent;
+			border: none;
+		}
+
+		.dropdown-sort {
+			background: transparent;
+			-webkit-box-shadow: 0 0px 0px rgba(0,0,0,0);
+			box-shadow: 0 0px 0px rgba(0,0,0,0);
+			border: none;
+			border-radius: 0px;
+		}
+		.library-nav {
+			background: #4285f4;
+			color: #ffffff;
+			text-decoration-color: #ffffff;
+			border-radius: 0;
+			border: 0px;
+		}
+		.navbar .nav > li > a {
+		    color:  #fff;
+		}
+		.navbar-default .navbar-brand {
+			color: #fff;
+		}
+		li > .filter-buttons {
+			pointer-events: none;
+			cursor: default;
+		}
+		.filter-checkbox {
+			pointer-events: auto;
+			float: right;
+		}
+		.row {
+		    margin-left: 0 !important;
+		    margin-right: 0 !important;
+		}
+    </style>
+</head>
+<body>
+ 		<div id="overlay-back"></div>
 		<div id="overlay">
 			<span>
 				<div id="signin"> 
@@ -167,40 +162,63 @@
 				</div>
 			</span>
 		</div> 
-  		<div id="header-container">
-	  		<div class="row">
-		  		<div class="col-md-1" id="logo"> <p> SCLibrary </p> </div>
-		  		<div class="col-md-10">
-		  			<div id="header-buttons">
-				  		<p id="sort-date" class="sort-button" sort="descending"> Date </p>
-				  		<p id="sort-title" class="sort-button" sort="descending"> Title </p>
-				  		<p id="sort-artist" class="sort-button" sort="descending"> Artist </p>
-				  		<p id="sort-favorites" class="sort-button" sort="descending"> Likes </p>
-				  		<p id="sort-plays" class="sort-button" sort="descending"> Plays </p>
-				  		<p id="shuffle" class="sort-button" sort="descending"> Shuffle </p>
-				  		<label> Remixes: <input id="remixes" type="checkbox" checked></label>
-				  		<label> Originals: <input id="originals" type="checkbox" checked></label>
-				  		<p id="refresh" class="sort-button" sort="descending"> Refresh </p>
-				  		<p id="play_prev" class="sort-button"> Prev </p>
-				  		<p id="play_next" class="sort-button"> Next </p>
-			  		</div>
-		  			<div id="search-container">
-		  				<input type="search" class="form-control" id="searchbar" placeholder="Search...">
-		  			</div>
-				</div>
-				<div class="col-md-1"><p id="user-select"> Username </p></div>
+	<nav class="navbar navbar-default library-nav">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#"> SCLibrary </a>
+			</div>
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav">
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> Sort <span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a class="sort-button" href="#"> Date Added </a></li>
+							<li><a class="sort-button" href="#"> Artist</a></li>
+							<li><a class="sort-button" href="#"> Song Title</a></li>
+							<li><a class="sort-button" href="#"> Plays </a></li>
+						</ul>
+					</li>
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> Filter <span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="#" class="filter-buttons"> Originals <input class="filter-checkbox" id="originals" type="checkbox" checked></a></li>
+							<li><a href="#" class="filter-buttons"> Filters <input class="filter-checkbox" id="remixes" type="checkbox" checked></a></li>
+						</ul>
+					</li>
+				</ul>
+				<form class="navbar-form navbar-left" role="search">
+					<div class="form-group">
+						<input id="searchbar" type="text" class="form-control" placeholder="Search Library" style="width: 100%;">
+					</div>
+				</form>
+				<ul class="nav navbar-nav navbar-right">
+					<li><a href="#"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span></a></li>
+					<li><a href="#"><span class="glyphicon glyphicon-play" aria-hidden="true"></span></a></li>
+					<li><a href="#"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></a></li>
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> lnymsc <span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="#"> Refresh Library </a></li>
+							<li><a href="#" id="change-user">Change User</a></li>
+						</ul>
+					</li>
+				</ul>
 			</div>
 		</div>
-		<div class="row">
-	  		<div class="col-md-1"></div>
-	  		<div class="col-md-10">
-	  			<div id="main"></div>
-			</div>
-			<div class="col-md-1"></div>
+	</nav>
+	<div class="row">
+  		<div class="col-md-1"></div>
+  		<div class="col-md-10">
+  			<div id="main"></div>
 		</div>
-		<div class="row">
-	  		<div class="col-md-12" id="player"> </div>
-		</div>
-  	</body>
+		<div class="col-md-1"></div>
+	</div>
+</body>
 	<script src="/js/player.js" type="text/babel"></script>
 </html>
