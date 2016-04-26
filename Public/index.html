@@ -152,16 +152,16 @@
     </style>
 </head>
 <body>
- 		<div id="overlay-back"></div>
-		<div id="overlay">
-			<span>
-				<div id="signin"> 
-					<p id="signin-label">Soundcloud Username: </p>
-					<input id="signin-field" type="text">
-					<input id="signin-submit" type="submit" value="Enter">
-				</div>
-			</span>
-		</div> 
+	<div id="overlay-back"></div>
+	<div id="overlay">
+		<span>
+			<div id="signin"> 
+				<p id="signin-label">Soundcloud Username: </p>
+				<input id="signin-field" type="text">
+				<input id="signin-submit" type="submit" value="Enter">
+			</div>
+		</span>
+	</div> 
 	<nav class="navbar navbar-default library-nav">
 		<div class="container-fluid">
 			<div class="navbar-header">
@@ -178,10 +178,10 @@
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> Sort <span class="caret"></span></a>
 						<ul class="dropdown-menu">
-							<li><a class="sort-button" href="#"> Date Added </a></li>
-							<li><a class="sort-button" href="#"> Artist</a></li>
-							<li><a class="sort-button" href="#"> Song Title</a></li>
-							<li><a class="sort-button" href="#"> Plays </a></li>
+							<li><a id="sort-date" class="sort-button" href="#"> Date Added </a></li>
+							<li><a id="sort-artist" class="sort-button" href="#"> Artist</a></li>
+							<li><a id="sort-title" class="sort-button" href="#"> Song Title</a></li>
+							<li><a id="sort-plays" class="sort-button" href="#"> Plays </a></li>
 						</ul>
 					</li>
 					<li class="dropdown">
@@ -191,6 +191,7 @@
 							<li><a href="#" class="filter-buttons"> Filters <input class="filter-checkbox" id="remixes" type="checkbox" checked></a></li>
 						</ul>
 					</li>
+					<li> <a href="#" id="shuffle"><span class="glyphicon glyphicon-random"></span></a></li>
 				</ul>
 				<form class="navbar-form navbar-left" role="search">
 					<div class="form-group">
@@ -198,13 +199,13 @@
 					</div>
 				</form>
 				<ul class="nav navbar-nav navbar-right">
-					<li><a href="#"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span></a></li>
+					<li><a href="#" id="play_prev"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span></a></li>
 					<li><a href="#"><span class="glyphicon glyphicon-play" aria-hidden="true"></span></a></li>
-					<li><a href="#"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></a></li>
+					<li><a href="#" id="play_next"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></a></li>
 					<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> lnymsc <span class="caret"></span></a>
+						<a href="#" id="user-menu" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> User <span class="caret"></span></a>
 						<ul class="dropdown-menu">
-							<li><a href="#"> Refresh Library </a></li>
+							<li><a href="#" id="refresh"> Refresh Library </a></li>
 							<li><a href="#" id="change-user">Change User</a></li>
 						</ul>
 					</li>

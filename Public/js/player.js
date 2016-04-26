@@ -65,8 +65,6 @@ var Song = React.createClass({
         var width = rect.width;
         var percentage = ((event.clientX - left)/width);
         var time = parseFloat(Math.floor((percentage*songPlayer.audio.duration)))
-        console.log(event.clientX, rect, rect.x, rect.width);
-
         songPlayer.audio.currentTime = time;
       },
 	render: function() {
@@ -77,9 +75,9 @@ var Song = React.createClass({
 		return (
 			<div>
                 <span className={glyph_class} onClick={this.playSong}></span>
-                <div className={"song-info-container"}> 
-  				  <h3> {this.props.song.user.username} </h3>
-  				  <p> {this.props.song.title} </p>
+                <div className={"song-info-container"}>
+                    <h3> {this.props.song.user.username} </h3>
+                    <h4> {this.props.song.title} </h4>
                 </div>
                 <div id={'player_'+this.props.song.id} onClick={this.registerClick}></div>
         	   {is_current_song ? <div><div className={"current-time"} id={"current-time-"+this.props.song.id}>{'0:00'}</div><div className={"duration"} id={"duration"+this.props.song.id}> {songPlayer.millisToMinutesAndSeconds(this.props.song.duration)}</div></div> : null}
@@ -123,11 +121,12 @@ var Song = React.createClass({
 
 
 //------------------------------------------------------------------------------------------------
-var renderLibrary = function(displayList, filterOnly) {
+var renderLibrary = function(displayList) {
 	$('#main').empty();
 	var filteredPlaylist = filterLibrary(displayList);
 	var sortedPlaylist = sortLibrary(filteredPlaylist);	
 	songPlayer.playlist = applyPlaylistIDs(sortedPlaylist);
+    console.log(songPlayer.playlist);
 	ReactDOM.render(
 	  <SongList songs={songPlayer.playlist}/>,
 	  document.getElementById('main')
@@ -181,7 +180,7 @@ var filterLibrary = function(library) {
 }
 
 var sortLibrary = function(library) {
-    switch (librarySort) {
+    switch (songPlayer.librarySort) {
         case 0:
             library.sort(sortTitle);
             break;
@@ -198,7 +197,11 @@ var sortLibrary = function(library) {
             library.sort(sortPlays);
             break;
         case 5:
-            library = shuffle(library);
+            if (!songPlayer.shuffled) {
+                console.log("Shuffling");
+                library = shuffle(library);
+                songPlayer.shuffled = true;
+            } 
             break;
     }
     return library;
@@ -277,8 +280,9 @@ var shuffle = function(library) {
 var fullLibrary = [];
 var responseList = [];
 var searchTimer = null;
-var librarySort = null;
 var songPlayer = {
+    librarySort: null,
+    shuffled: false,
     is_dissociated: false,
     dissociated_playlist: null,
     playlist: null,
@@ -342,7 +346,7 @@ var songPlayer = {
             document.getElementById('current-time-' + songPlayer.soundcloud_id).innerHTML = timeInMinutes;
         });
         this.audio.play();
-        renderLibrary(fullLibrary);
+        //renderLibrary(fullLibrary);
         clearVisualizer();
         visualizer(true);
     },
@@ -364,7 +368,7 @@ var songPlayer = {
             document.getElementById('current-time-' + songPlayer.soundcloud_id).innerHTML = timeInMinutes;
         });
         this.audio.play();
-        renderLibrary(fullLibrary);
+        //renderLibrary(fullLibrary);
         clearVisualizer();
         visualizer(true);
     },
@@ -501,6 +505,7 @@ var combineLists = function() {
             stream_url: fullLibrary[i].stream_url,
             title: fullLibrary[i].title,
             uri: fullLibrary[i].uri,
+            artwork_url: fullLibrary[i].artwork_url,
             user: {
                 id: fullLibrary[i].user.id,
                 username: fullLibrary[i].user.username,
@@ -510,7 +515,6 @@ var combineLists = function() {
         fullLibrary[i] = trimmedSong
     }
     console.log('Setting localstorage..');
-    console.log(fullLibrary);
     localStorage.setItem("fullLibrary", JSON.stringify(fullLibrary));
     $('#main').empty();
     fullLibrary = fullLibrary;
@@ -558,57 +562,50 @@ var loadPlaylists = function() {
 
 
 //-------------------------------------------------------------------------------------------------------//
-var toggle = function(button) {
-    if ($('#sort-' + button).attr('sort') == 'descending') {
-        $('#sort-' + button).attr('sort', 'ascending');
-    } else {
-        $('#sort-' + button).attr('sort', 'descending');
-    }
-}
-
 $('#sort-title').click(function() {
-    toggle('title');
-    librarySort = 0;
+    songPlayer.librarySort = 0;
     songPlayer.dissociate();
+    songPlayer.shuffled = false;
     renderLibrary(fullLibrary);
     visualizer();
 });
 
 $('#sort-artist').click(function() {
-    toggle('artist');
-    librarySort = 1;
+    songPlayer.librarySort = 1;
     songPlayer.dissociate();
+    songPlayer.shuffled = false;
     renderLibrary(fullLibrary);
     visualizer();
 });
 
 $("#sort-date").click(function() {
-    toggle('date');
-    librarySort = 2;
+    songPlayer.librarySort = 2;
     songPlayer.dissociate();
+    songPlayer.shuffled = false;
     renderLibrary(fullLibrary);
     visualizer();
 });
 
 $("#sort-favorites").click(function() {
-    toggle('favorites');
-    librarySort = 3;
+    songPlayer.librarySort = 3;
     songPlayer.dissociate();
+    songPlayer.shuffled = false;
     renderLibrary(fullLibrary);
     visualizer();
 });
 
 $("#sort-plays").click(function() {
-    toggle('plays');
-    librarySort = 4;
+    songPlayer.librarySort = 4;
     songPlayer.dissociate();
+    songPlayer.shuffled = false;
     renderLibrary(fullLibrary);
     visualizer();
 });
 
 $("#shuffle").click(function() {
-    librarySort = 5;
+    songPlayer.librarySort = 5;
     songPlayer.dissociate();
+    songPlayer.shuffled = false;    
     renderLibrary(fullLibrary);
     visualizer();
 });
@@ -778,29 +775,28 @@ var clearLocalData = function() {
 var authenticateUsername = function(username) {
     clearLocalData();
     var url = 'https://api.soundcloud.com/resolve?url=https://soundcloud.com/'+String(username)+'&client_id=96089e67110795b69a95705f38952d8f';
-    console.log(url);
-        $.get({
-            url: url,
-            dataType: 'json'
-        })
-        .success(function(data, status) {
-            try {
-                data = JSON.parse(data);            
-            } catch(e) {
-                console.log(e);
-            }
-            console.log(data);
-            songPlayer.user_id = data.id;
-            localStorage.clear();
-            localStorage.setItem("soundcloud_user_id", data.id);
-            localStorage.setItem("soundcloud_user_name", data.permalink);
-            document.getElementById('user-select').innerHTML = data.permalink;
-            if (songPlayer.audio) songPlayer.pause();
-            startLibrary();
-        })
-        .fail(function(data, status) {
-            console.log(data, status);
-        });
+    $.get({
+        url: url,
+        dataType: 'json'
+    })
+    .success(function(data, status) {
+        try {
+            data = JSON.parse(data);            
+        } catch(e) {
+            console.log(e);
+        }
+        console.log(data);
+        songPlayer.user_id = data.id;
+        localStorage.clear();
+        localStorage.setItem("soundcloud_user_id", data.id);
+        localStorage.setItem("soundcloud_user_name", data.permalink);
+        document.getElementById('user-menu').innerHTML = data.permalink;
+        if (songPlayer.audio) songPlayer.pause();
+        startLibrary();
+    })
+    .fail(function(data, status) {
+        console.log(data, status);
+    });
 }
 //Kick off the site.
 $(document).ready(function() {
@@ -808,7 +804,7 @@ $(document).ready(function() {
     var user_name = localStorage.getItem("soundcloud_user_name");
     if (user_id && user_name) {
         songPlayer.user_id = user_id;
-        document.getElementById('change-user').innerHTML = user_name;
+        document.getElementById('user-menu').innerHTML = user_name;
         startLibrary(); 
     } else {
         document.getElementById('overlay-back').style.display = 'block';
