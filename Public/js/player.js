@@ -81,7 +81,7 @@ var Song = React.createClass({
                 </div>
                 <div id={'player_'+this.props.song.id} onClick={this.registerClick}></div>
         	   {is_current_song ? <div><div className={"current-time"} id={"current-time-"+this.props.song.id}>{'0:00'}</div><div className={"duration"} id={"duration"+this.props.song.id}> {songPlayer.millisToMinutesAndSeconds(this.props.song.duration)}</div></div> : null}
-		</div>
+            </div>
 		);
 	}
 });
@@ -126,7 +126,6 @@ var renderLibrary = function(displayList) {
 	var filteredPlaylist = filterLibrary(displayList);
 	var sortedPlaylist = sortLibrary(filteredPlaylist);	
 	songPlayer.playlist = applyPlaylistIDs(sortedPlaylist);
-    console.log(songPlayer.playlist);
 	ReactDOM.render(
 	  <SongList songs={songPlayer.playlist}/>,
 	  document.getElementById('main')
@@ -141,13 +140,12 @@ var applyPlaylistIDs = function(playlist) {
 
 var filterLibrary = function(library) {
     var returnLibrary = [];
+    var term = document.getElementById('searchbar').value.toLowerCase();    
     library.forEach(function(song) {
-
         var title = song.title.toLowerCase();
         var user = song.user.username.toLowerCase();
-        var term = document.getElementById('searchbar').value;
         if (term.length > 0) {
-            if (title.indexOf(term) > -1 || user.toLowerCase().indexOf(term) > -1) {
+            if (title.indexOf(term) > -1 || user.indexOf(term) > -1) {
                 var isRemix = false;
                 if (title.indexOf("remix") > -1 ||
                     title.indexOf("edit") > -1 ||
@@ -197,11 +195,14 @@ var sortLibrary = function(library) {
             library.sort(sortPlays);
             break;
         case 5:
-            if (!songPlayer.shuffled) {
+            if (!songPlayer.is_shuffled) {
                 console.log("Shuffling");
                 library = shuffle(library);
-                songPlayer.shuffled = true;
-            } 
+                songPlayer.shuffled_playlist = library;
+                songPlayer.is_shuffled = true;
+            } else {
+                library = songPlayer.shuffled_playlist;
+            }
             break;
     }
     return library;
@@ -282,8 +283,9 @@ var responseList = [];
 var searchTimer = null;
 var songPlayer = {
     librarySort: null,
-    shuffled: false,
+    is_shuffled: false,
     is_dissociated: false,
+    shuffled_playlist: null,
     dissociated_playlist: null,
     playlist: null,
     audio: null,
@@ -343,10 +345,11 @@ var songPlayer = {
         this.audio.addEventListener('ended', this._addNextSongHandler.bind(this));
         this.audio.addEventListener('timeupdate', function(event) {
             var timeInMinutes = songPlayer.millisToMinutesAndSeconds(this.currentTime * 1000)
-            document.getElementById('current-time-' + songPlayer.soundcloud_id).innerHTML = timeInMinutes;
+            var currentTime = document.getElementById('current-time-' + songPlayer.soundcloud_id);
+            if (currentTime) currentTime.innerHTML = timeInMinutes;
         });
         this.audio.play();
-        //renderLibrary(fullLibrary);
+        renderLibrary(fullLibrary);
         clearVisualizer();
         visualizer(true);
     },
@@ -368,7 +371,7 @@ var songPlayer = {
             document.getElementById('current-time-' + songPlayer.soundcloud_id).innerHTML = timeInMinutes;
         });
         this.audio.play();
-        //renderLibrary(fullLibrary);
+        renderLibrary(fullLibrary);
         clearVisualizer();
         visualizer(true);
     },
@@ -565,7 +568,7 @@ var loadPlaylists = function() {
 $('#sort-title').click(function() {
     songPlayer.librarySort = 0;
     songPlayer.dissociate();
-    songPlayer.shuffled = false;
+    songPlayer.is_shuffled = false;
     renderLibrary(fullLibrary);
     visualizer();
 });
@@ -573,7 +576,7 @@ $('#sort-title').click(function() {
 $('#sort-artist').click(function() {
     songPlayer.librarySort = 1;
     songPlayer.dissociate();
-    songPlayer.shuffled = false;
+    songPlayer.is_shuffled = false;
     renderLibrary(fullLibrary);
     visualizer();
 });
@@ -581,7 +584,7 @@ $('#sort-artist').click(function() {
 $("#sort-date").click(function() {
     songPlayer.librarySort = 2;
     songPlayer.dissociate();
-    songPlayer.shuffled = false;
+    songPlayer.is_shuffled = false;
     renderLibrary(fullLibrary);
     visualizer();
 });
@@ -589,7 +592,7 @@ $("#sort-date").click(function() {
 $("#sort-favorites").click(function() {
     songPlayer.librarySort = 3;
     songPlayer.dissociate();
-    songPlayer.shuffled = false;
+    songPlayer.is_shuffled = false;
     renderLibrary(fullLibrary);
     visualizer();
 });
@@ -597,7 +600,7 @@ $("#sort-favorites").click(function() {
 $("#sort-plays").click(function() {
     songPlayer.librarySort = 4;
     songPlayer.dissociate();
-    songPlayer.shuffled = false;
+    songPlayer.is_shuffled = false;
     renderLibrary(fullLibrary);
     visualizer();
 });
@@ -605,7 +608,7 @@ $("#sort-plays").click(function() {
 $("#shuffle").click(function() {
     songPlayer.librarySort = 5;
     songPlayer.dissociate();
-    songPlayer.shuffled = false;    
+    songPlayer.is_shuffled = false;    
     renderLibrary(fullLibrary);
     visualizer();
 });
@@ -668,7 +671,6 @@ var clearVisualizer = function() {
 }
 
 var visualizer = function(new_song) {
-    console.log(new_song);
     if (new_song) {
         window.cancelAnimationFrame(songPlayer.animation_id);
         songPlayer.audioCtx = new(window.AudioContext || window.webkitAudioContext)();
@@ -769,6 +771,8 @@ $('#signin-submit').on('click', function() {
 var clearLocalData = function() {
     fullLibrary = []
     responseList = [];
+    songPlayer.shuffled_playlist = null;
+    songPlayer.playlist = null;
     localStorage.clear();
 }
 
