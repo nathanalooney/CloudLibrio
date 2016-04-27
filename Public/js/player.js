@@ -737,6 +737,15 @@
         }
         //Kick off the site.
     $(document).ready(function() {
+
+        var ua = navigator.userAgent.toLowerCase(); 
+        if (ua.indexOf('safari') != -1) { 
+          if (ua.indexOf('chrome') == -1) {
+            document.getElementById('signin-label').innerHTML = "Hi there! It seems like you're using Safari to navigate the web! While this is all and good, Safari actually doesn't play nicely with a key aspect of Soundcloud's API (Due, likely, to Soundcloud's dev team not understanding CORS restrictions perfectly), so sadly you must use another browser to access this site. Sorry for the inconvenience!";
+            document.getElementById('signin-field').style.display = 'none';
+            document.getElementById('signin-submit').style.display = 'none';
+          }
+        }
         var user_id = localStorage.getItem("soundcloud_user_id");
         var user_name = localStorage.getItem("soundcloud_user_name");
         if (user_id && user_name) {
