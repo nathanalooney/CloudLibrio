@@ -85,7 +85,6 @@
         }
     });
 
-    //------------------------------------------------------------------------------------------------
     var startLibrary = function() {
         if (localStorage.getItem("fullLibrary") == null) {
             //Basically if it's a new user that hasn't used the site and doesn't have their library saved.
@@ -476,10 +475,6 @@
             return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
         }
     }
-
-
-
-    //-------------------------------------------------------------------------------------------------------//
     document.getElementById("sort-order").addEventListener('click', function() {
         var self = this;
         if (self.innerHTML == "Descending") {
@@ -700,8 +695,6 @@
         // Run the loop
         renderChart();
     };
-    // client_id: '96089e67110795b69a95705f38952d8f'
-    // redirect_uri: 'https://sclibrary.testing.com:3000/callback.html'
 
     var clearLocalData = function() {
         fullLibrary = []
@@ -714,7 +707,7 @@
     var authenticateUsername = function(userinput) {
             clearLocalData();
             if (songPlayer.audio) songPlayer.pause();
-            var url = (userinput.toLowerCase().indexOf('http') > -1) ? 'https://api.soundcloud.com/resolve?url='+userinput.trim('')+'&client_id=96089e67110795b69a95705f38952d8f' : 'https://api.soundcloud.com/resolve?url=https://soundcloud.com/' + userinput.trim() + '&client_id=96089e67110795b69a95705f38952d8f';
+            var url = (userinput.toLowerCase().indexOf('http') > -1) ? 'https://api.soundcloud.com/resolve?url=' + userinput.trim('') + '&client_id=96089e67110795b69a95705f38952d8f' : 'https://api.soundcloud.com/resolve?url=https://soundcloud.com/' + userinput.trim() + '&client_id=96089e67110795b69a95705f38952d8f';
             $.get({
                     url: url,
                     dataType: 'json'
@@ -734,7 +727,7 @@
                     if (songPlayer.audio) songPlayer.pause();
                     $('#overlay, #overlay-back').fadeOut(500);
                     $('body').removeClass('stop-scrolling');
-                    $('#user-select').html(data.permalink);  
+                    $('#user-select').html(data.permalink);
                     startLibrary();
                 })
                 .fail(function(data, status) {
