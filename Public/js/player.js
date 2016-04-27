@@ -169,12 +169,15 @@
                     library = songPlayer.shuffled_playlist;
                 }
                 break;
+            default:
+                library.sort(sortDate);
+                break;
         }
         return library;
     }
 
     var sortTitle = function(a, b) {
-        if ($('#sort-title').attr('sort') == 'ascending') {
+        if (document.getElementById('sort-order').innerHTML == 'Ascending') {
             b = [a, a = b][0];
         }
         if (a.title.replace(/\W/g, '').toLowerCase() < b.title.replace(/\W/g, '').toLowerCase()) {
@@ -185,7 +188,7 @@
     }
 
     var sortArtist = function(a, b) {
-        if ($('#sort-artist').attr('sort') == 'ascending') {
+        if (document.getElementById('sort-order').innerHTML == 'Ascending') {
             b = [a, a = b][0];
         }
         if (a.user.username.replace(/\W/g, '').toLowerCase() < b.user.username.replace(/\W/g, '').toLowerCase()) {
@@ -196,7 +199,7 @@
     }
 
     var sortDate = function(a, b) {
-        if ($('#sort-date').attr('sort') == 'descending') {
+        if (document.getElementById('sort-order').innerHTML == 'Ascending') {
             b = [a, a = b][0];
         }
         if (a.sclibrary_id < b.sclibrary_id) {
@@ -207,7 +210,7 @@
     }
 
     var sortFavorites = function(a, b) {
-        if ($('#sort-favorites').attr('sort') == 'ascending') {
+        if (document.getElementById('sort-order').innerHTML == 'Ascending') {
             b = [a, a = b][0];
         }
         if (parseInt(a.favoritings_count) < parseInt(b.favoritings_count)) {
@@ -218,7 +221,7 @@
     }
 
     var sortPlays = function(a, b) {
-        if ($('#sort-plays').attr('sort') == 'ascending') {
+        if (document.getElementById('sort-order').innerHTML == 'Ascending') {
             b = [a, a = b][0];
         }
         if (parseInt(a.playback_count) < parseInt(b.playback_count)) {
@@ -459,6 +462,18 @@
     }
 
     //-------------------------------------------------------------------------------------------------------//
+    document.getElementById("sort-order").addEventListener('click', function() {
+        var self = this;
+        if (self.innerHTML == "Descending") {
+            self.innerHTML = "Ascending";
+        } else {
+            self.innerHTML = "Descending";
+        }
+        songPlayer.dissociate();
+        songPlayer.is_shuffled = false;
+        renderLibrary(fullLibrary);
+        visualizer();
+    });
     document.getElementById("sort-title").addEventListener('click', function() {
         songPlayer.librarySort = 0;
         songPlayer.dissociate();
