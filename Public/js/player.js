@@ -491,13 +491,13 @@
     //     visualizer();
     // });
 
-    // document.getElementById("sort-plays").addEventListener('click', function() {
-    //     songPlayer.librarySort = 4;
-    //     songPlayer.dissociate();
-    //     songPlayer.is_shuffled = false;
-    //     renderLibrary(fullLibrary);
-    //     visualizer();
-    // });
+    document.getElementById("sort-plays").addEventListener('click', function() {
+        songPlayer.librarySort = 4;
+        songPlayer.dissociate();
+        songPlayer.is_shuffled = false;
+        renderLibrary(fullLibrary);
+        visualizer();
+    });
 
     document.getElementById("shuffle").addEventListener('click', function() {
         songPlayer.librarySort = 5;
