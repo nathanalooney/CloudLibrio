@@ -458,22 +458,8 @@
         renderLibrary(fullLibrary);
     }
 
-
-    var loadPlaylists = function() {
-        var client_id = '96089e67110795b69a95705f38952d8f'
-        $.get('https://api.soundcloud.com/users/' + songPlayer.user_id + '/playlists?client_id=' + client_id, function(response) {
-            response.forEach(function(playlist) {
-                $('#main').append('<h1>' + playlist.title + '</h1>');
-                playlist.tracks.forEach(function(song) {
-                    $('#main').append('<h3>' + song.user.username + '</h3>');
-                    $('#main').append('<p>' + song.title + '</p>');
-                });
-            })
-        });
-    }
-
     //-------------------------------------------------------------------------------------------------------//
-    $('#sort-title').click(function() {
+    document.getElementById("sort-title").addEventListener('click', function() {
         songPlayer.librarySort = 0;
         songPlayer.dissociate();
         songPlayer.is_shuffled = false;
@@ -481,7 +467,7 @@
         visualizer();
     });
 
-    $('#sort-artist').click(function() {
+    document.getElementById("sort-artist").addEventListener('click', function() {
         songPlayer.librarySort = 1;
         songPlayer.dissociate();
         songPlayer.is_shuffled = false;
@@ -489,7 +475,7 @@
         visualizer();
     });
 
-    $("#sort-date").click(function() {
+    document.getElementById("sort-date").addEventListener('click', function() {
         songPlayer.librarySort = 2;
         songPlayer.dissociate();
         songPlayer.is_shuffled = false;
@@ -497,23 +483,23 @@
         visualizer();
     });
 
-    $("#sort-favorites").click(function() {
-        songPlayer.librarySort = 3;
-        songPlayer.dissociate();
-        songPlayer.is_shuffled = false;
-        renderLibrary(fullLibrary);
-        visualizer();
-    });
+    // document.getElementById("ssort-favorites").addEventListener('click', function() {
+    //     songPlayer.librarySort = 3;
+    //     songPlayer.dissociate();
+    //     songPlayer.is_shuffled = false;
+    //     renderLibrary(fullLibrary);
+    //     visualizer();
+    // });
 
-    $("#sort-plays").click(function() {
-        songPlayer.librarySort = 4;
-        songPlayer.dissociate();
-        songPlayer.is_shuffled = false;
-        renderLibrary(fullLibrary);
-        visualizer();
-    });
+    // document.getElementById("sort-plays").addEventListener('click', function() {
+    //     songPlayer.librarySort = 4;
+    //     songPlayer.dissociate();
+    //     songPlayer.is_shuffled = false;
+    //     renderLibrary(fullLibrary);
+    //     visualizer();
+    // });
 
-    $("#shuffle").click(function() {
+    document.getElementById("shuffle").addEventListener('click', function() {
         songPlayer.librarySort = 5;
         songPlayer.dissociate();
         songPlayer.is_shuffled = false;
@@ -521,24 +507,24 @@
         visualizer();
     });
 
-    $("#remixes").change(function() {
+    document.getElementById("remixes").addEventListener('change', function() {
         songPlayer.dissociate();
         renderLibrary(fullLibrary, true);
         visualizer();
     });
 
-    $("#originals").change(function() {
+    document.getElementById("originals").addEventListener('change', function() {
         songPlayer.dissociate();
         renderLibrary(fullLibrary, true);
         visualizer();
     });
 
-    $('#refresh').click(function() {
+    document.getElementById('refresh').addEventListener('click', function() {
         songPlayer.dissociate();
         loadLibrary();
     });
 
-    $('#searchbar').keyup(function() {
+    document.getElementById('searchbar').addEventListener('keyup', function() {
         clearTimeout(searchTimer);
         searchTimer = setTimeout(function() {
             songPlayer.dissociate();
@@ -555,8 +541,12 @@
         if (songPlayer.audio) {
             if (songPlayer.isPaused()) {
                 songPlayer.play();
+                renderLibrary(fullLibrary);
+                visualizer();
             } else {
                 songPlayer.pause();
+                renderLibrary(fullLibrary);
+                visualizer();
             }
         }
     });
