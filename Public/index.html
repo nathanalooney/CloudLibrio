@@ -99,29 +99,32 @@
 		}
 		#signin {
 			width:500px;
-			height:200px;
+			height:40px;
 			position:absolute;
 			left:50%;
 			top:50%;
-			margin:-100px 0 0 -150px;
+			margin-left: -250px;
+			margin-top: -20px;
+			text-align: center;
 		}
 		#signin-field {
-			display: inline-block;
 			background: transparent;
-			border: none;
 			padding-left: 10px;
 			border-radius: 5px;
+			border-right: none;
+			border-left: none;
+			text-align: center;
 		}
 		#signin-label {
-			display: inline-block;
 			padding-right: 10px;
 		}
 		#signin-submit {
-			display: inline-block;
+			display: block;
 			background: transparent;
 			border: none;
+			margin-top: 10px;
+			cursor: pointer;
 		}
-
 		.dropdown-sort {
 			background: transparent;
 			-webkit-box-shadow: 0 0px 0px rgba(0,0,0,0);
@@ -172,9 +175,9 @@
 	<div id="overlay">
 		<span>
 			<div id="signin"> 
-				<p id="signin-label">Soundcloud Username: </p>
+				<p id="signin-label">Soundcloud Username or Profile Web Address: </p>
 				<input id="signin-field" type="text">
-				<input id="signin-submit" type="submit" value="Enter">
+				<p id="signin-submit"> Submit </p>
 			</div>
 		</span>
 	</div> 

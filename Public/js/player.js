@@ -86,6 +86,95 @@
     });
 
     //------------------------------------------------------------------------------------------------
+    var startLibrary = function() {
+        if (localStorage.getItem("fullLibrary") == null) {
+            //Basically if it's a new user that hasn't used the site and doesn't have their library saved.
+            console.log("Starting library load.");
+            loadLibrary();
+
+        } else {
+            console.log("Loading from local storage.");
+            fullLibrary = JSON.parse(localStorage.getItem("fullLibrary"));
+            //addNewFavorites();
+            fullLibrary = fullLibrary;
+            renderLibrary(fullLibrary);
+        }
+    }
+
+    var loadLibrary = function() {
+        var client_id = 'client_id=96089e67110795b69a95705f38952d8f'
+        $('#main').html('<p id="load-status"> Loading Your Full Library </p>');
+        $.get('https://api.soundcloud.com/users/' + songPlayer.user_id + '/favorites?' + client_id + '&limit=200&linked_partitioning=1', function(response) {
+            try {
+                var collection = JSON.parse(response.collection);
+            } catch (e) {
+                var collection = response.collection
+            }
+            responseList.push(collection);
+            buildLibrary(response.next_href);
+            $('#load-status').text('Loading Your Full Library (' + response.collection.length + ' songs)');
+        });
+    }
+
+    //Recursive function to sequentially get list of songs in library.
+    var buildLibrary = function(next_href) {
+        $.get(next_href).then(function(response) {
+            console.log("Still loading...");
+            try {
+                var collection = JSON.parse(response.collection);
+            } catch (e) {
+                var collection = response.collection
+            }
+            responseList.push(collection);
+            if (response.next_href) {
+                var loadedCount = 0;
+                responseList.forEach(function(collection) {
+                    loadedCount += collection.length;
+                });
+                $('#load-status').text('Loading Your Full Library (' + loadedCount + ' songs)');
+                buildLibrary(response.next_href);
+            } else {
+                console.log('Done');
+                combineLists();
+            }
+        });
+    }
+
+    //After each batch is loaded, goes through and combines them into one library.
+    var combineLists = function() {
+        console.log('Called combineLists...')
+        fullLibrary = [];
+        for (var i = 0; i < responseList.length; i++) {
+            fullLibrary = fullLibrary.concat(responseList[i])
+        }
+        for (var i = 0; i < fullLibrary.length; i++) {
+            var trimmedSong = {
+                duration: fullLibrary[i].duration,
+                favoritings_count: fullLibrary[i].favoritings_count,
+                id: fullLibrary[i].id,
+                permalink_url: fullLibrary[i].permalink_url,
+                playback_count: fullLibrary[i].playback_count,
+                stream_url: fullLibrary[i].stream_url,
+                title: fullLibrary[i].title,
+                uri: fullLibrary[i].uri,
+                artwork_url: fullLibrary[i].artwork_url,
+                user: {
+                    id: fullLibrary[i].user.id,
+                    username: fullLibrary[i].user.username,
+                },
+                sclibrary_id: i
+            }
+            fullLibrary[i] = trimmedSong
+        }
+        console.log('Setting localstorage..');
+        localStorage.setItem("fullLibrary", JSON.stringify(fullLibrary));
+        $('#main').empty();
+        fullLibrary = fullLibrary;
+        console.log('Calling render...')
+        renderLibrary(fullLibrary);
+    }
+
+
     var renderLibrary = function(displayList) {
         $('#main').empty();
         var filteredPlaylist = filterLibrary(displayList);
@@ -388,78 +477,7 @@
         }
     }
 
-    var loadLibrary = function() {
-        var client_id = 'client_id=96089e67110795b69a95705f38952d8f'
-        $('#main').html('<p id="load-status"> Loading Your Full Library </p>');
-        $.get('https://api.soundcloud.com/users/' + songPlayer.user_id + '/favorites?' + client_id + '&limit=200&linked_partitioning=1', function(response) {
-            try {
-                var collection = JSON.parse(response.collection);
-            } catch (e) {
-                var collection = response.collection
-            }
-            responseList.push(collection);
-            buildLibrary(response.next_href);
-            $('#load-status').text('Loading Your Full Library (' + response.collection.length + ' songs)');
-        });
-    }
 
-    //Recursive function to sequentially get list of songs in library.
-    var buildLibrary = function(next_href) {
-        $.get(next_href).then(function(response) {
-            console.log("Still loading...");
-            try {
-                var collection = JSON.parse(response.collection);
-            } catch (e) {
-                var collection = response.collection
-            }
-            responseList.push(collection);
-            if (response.next_href) {
-                var loadedCount = 0;
-                responseList.forEach(function(collection) {
-                    loadedCount += collection.length;
-                });
-                $('#load-status').text('Loading Your Full Library (' + loadedCount + ' songs)');
-                buildLibrary(response.next_href);
-            } else {
-                console.log('Done');
-                combineLists();
-            }
-        });
-    }
-
-    //After each batch is loaded, goes through and combines them into one library.
-    var combineLists = function() {
-        console.log('Called combineLists...')
-        fullLibrary = [];
-        for (var i = 0; i < responseList.length; i++) {
-            fullLibrary = fullLibrary.concat(responseList[i])
-        }
-        for (var i = 0; i < fullLibrary.length; i++) {
-            var trimmedSong = {
-                duration: fullLibrary[i].duration,
-                favoritings_count: fullLibrary[i].favoritings_count,
-                id: fullLibrary[i].id,
-                permalink_url: fullLibrary[i].permalink_url,
-                playback_count: fullLibrary[i].playback_count,
-                stream_url: fullLibrary[i].stream_url,
-                title: fullLibrary[i].title,
-                uri: fullLibrary[i].uri,
-                artwork_url: fullLibrary[i].artwork_url,
-                user: {
-                    id: fullLibrary[i].user.id,
-                    username: fullLibrary[i].user.username,
-                },
-                sclibrary_id: i
-            }
-            fullLibrary[i] = trimmedSong
-        }
-        console.log('Setting localstorage..');
-        localStorage.setItem("fullLibrary", JSON.stringify(fullLibrary));
-        $('#main').empty();
-        fullLibrary = fullLibrary;
-        console.log('Calling render...')
-        renderLibrary(fullLibrary);
-    }
 
     //-------------------------------------------------------------------------------------------------------//
     document.getElementById("sort-order").addEventListener('click', function() {
@@ -575,39 +593,22 @@
         $('body').addClass('stop-scrolling');
     });
     document.getElementById('signin-submit').addEventListener('click', function() {
-        $('#overlay, #overlay-back').fadeOut(500);
-        $('body').removeClass('stop-scrolling');
+        // $('#overlay, #overlay-back').fadeOut(500);
+        // $('body').removeClass('stop-scrolling');
+        // $('#user-select').html(username);        
         var username = document.getElementById('signin-field').value;
-        $('#user-select').html(username);
         authenticateUsername(username);
     })
     document.getElementById('signin-field').addEventListener('keyup', function(event) {
         if (event.keyCode === 13) {
-            $('#overlay, #overlay-back').fadeOut(500);
-            $('body').removeClass('stop-scrolling');
             var username = document.getElementById('signin-field').value;
-            $('#user-select').html(username);
             authenticateUsername(username);
-
         }
     })
 
     //-------------------------------------------------------------------------------------------------------------//
 
-    var startLibrary = function() {
-        if (localStorage.getItem("fullLibrary") == null) {
-            //Basically if it's a new user that hasn't used the site and doesn't have their library saved.
-            console.log("Starting library load.");
-            loadLibrary();
 
-        } else {
-            console.log("Loading from local storage.");
-            fullLibrary = JSON.parse(localStorage.getItem("fullLibrary"));
-            //addNewFavorites();
-            fullLibrary = fullLibrary;
-            renderLibrary(fullLibrary);
-        }
-    }
 
     var clearVisualizer = function() {
         var svg = document.getElementsByTagName('svg')[0];
@@ -710,9 +711,10 @@
         localStorage.clear();
     }
 
-    var authenticateUsername = function(username) {
+    var authenticateUsername = function(userinput) {
             clearLocalData();
-            var url = 'https://api.soundcloud.com/resolve?url=https://soundcloud.com/' + String(username) + '&client_id=96089e67110795b69a95705f38952d8f';
+            if (songPlayer.audio) songPlayer.pause();
+            var url = (userinput.toLowerCase().indexOf('http') > -1) ? 'https://api.soundcloud.com/resolve?url='+userinput.trim('')+'&client_id=96089e67110795b69a95705f38952d8f' : 'https://api.soundcloud.com/resolve?url=https://soundcloud.com/' + userinput.trim() + '&client_id=96089e67110795b69a95705f38952d8f';
             $.get({
                     url: url,
                     dataType: 'json'
@@ -730,10 +732,14 @@
                     localStorage.setItem("soundcloud_user_name", data.permalink);
                     document.getElementById('user-menu').innerHTML = data.permalink;
                     if (songPlayer.audio) songPlayer.pause();
+                    $('#overlay, #overlay-back').fadeOut(500);
+                    $('body').removeClass('stop-scrolling');
+                    $('#user-select').html(data.permalink);  
                     startLibrary();
                 })
                 .fail(function(data, status) {
-                    console.log(data, status);
+                    console.log('Failure');
+                    document.getElementById('signin-label').innerHTML = "Sorry, we couldn't locate that profile. Please try again."
                 });
         }
         //Kick off the site.
