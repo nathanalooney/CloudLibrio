@@ -102,7 +102,7 @@
 
     var loadLibrary = function() {
         var client_id = 'client_id=96089e67110795b69a95705f38952d8f'
-        $('#main').html('<p id="load-status"> Loading Your Full Library </p>');
+        document.getElementById('main').innerHTML = '<p id="load-status"> Loading Your Full Library </p>';
         $.get('https://api.soundcloud.com/users/' + songPlayer.user_id + '/favorites?' + client_id + '&limit=200&linked_partitioning=1', function(response) {
             try {
                 var collection = JSON.parse(response.collection);
@@ -111,7 +111,7 @@
             }
             responseList.push(collection);
             buildLibrary(response.next_href);
-            $('#load-status').text('Loading Your Full Library (' + response.collection.length + ' songs)');
+            document.getElementById('load-status').innerHTML = 'Loading Your Full Library (' + response.collection.length + ' songs)';
         });
     }
 
@@ -130,7 +130,7 @@
                 responseList.forEach(function(collection) {
                     loadedCount += collection.length;
                 });
-                $('#load-status').text('Loading Your Full Library (' + loadedCount + ' songs)');
+                document.getElementById('load-status').innerHTML = 'Loading Your Full Library (' + loadedCount + ' songs)';
                 buildLibrary(response.next_href);
             } else {
                 console.log('Done');
@@ -167,7 +167,7 @@
         }
         console.log('Setting localstorage..');
         localStorage.setItem("fullLibrary", JSON.stringify(fullLibrary));
-        $('#main').empty();
+        document.getElementById('main').innerHTML = '';
         fullLibrary = fullLibrary;
         console.log('Calling render...')
         renderLibrary(fullLibrary);
@@ -175,7 +175,7 @@
 
 
     var renderLibrary = function(displayList) {
-        $('#main').empty();
+        document.getElementById('main').innerHTML = '';
         var filteredPlaylist = filterLibrary(displayList);
         var sortedPlaylist = sortLibrary(filteredPlaylist);
         songPlayer.playlist = applyPlaylistIDs(sortedPlaylist);
@@ -209,8 +209,8 @@
                         title.indexOf('redo') > -1) {
                         isRemix = true;
                     }
-                    if ($('#remixes').is(':checked') && isRemix == true) returnLibrary.push(song);
-                    if ($('#originals').is(':checked') && isRemix == false) returnLibrary.push(song);
+                    if (document.getElementById('remixes').checked && isRemix == true) returnLibrary.push(song);
+                    if (document.getElementById('originals').checked && isRemix == false) returnLibrary.push(song);
                 }
             } else {
                 var isRemix = false;
@@ -223,8 +223,8 @@
                     title.indexOf('redo') > -1) {
                     isRemix = true;
                 }
-                if ($('#remixes').is(':checked') && isRemix == true) returnLibrary.push(song);
-                if ($('#originals').is(':checked') && isRemix == false) returnLibrary.push(song);
+                if (document.getElementById('remixes').checked && isRemix == true) returnLibrary.push(song);
+                if (document.getElementById('originals').checked && isRemix == false) returnLibrary.push(song);
             }
         });
         return returnLibrary;
@@ -353,11 +353,15 @@
         audioCtx: null,
         animation_id: null,
         user_id: null,
+        title: null,
+        artist: null,
         playNew: function(song) {
             this.associate();
             if (this.audio) this.pause();
             this._setIDs(song.playlist_id);
             this.soundcloud_id = song.id;
+            this.title = song.title;
+            this.artist = song.user.username
             var full_stream_url = this.playlist[song.playlist_id].stream_url + '?client_id=96089e67110795b69a95705f38952d8f';
             this.audio = new Audio(full_stream_url);
             this.audio.crossOrigin = 'anonymous';
@@ -369,6 +373,8 @@
 
             });
             this.play();
+            console.log(song.user);
+            document.getElementById('song-display').innerHTML = song.user.username + ' - '+song.title;
             clearVisualizer();
             visualizer(true);
         },
@@ -392,11 +398,13 @@
             this._setIDs(this.next_id);
 
             if (!this.is_dissociated) {
-                this.soundcloud_id = this.playlist[this.current_id].id;
-                var full_stream_url = this.playlist[this.current_id].stream_url + '?client_id=96089e67110795b69a95705f38952d8f';
+                var song = this.playlist[this.current_id];
+                this.soundcloud_id = song.id;
+                var full_stream_url = song.stream_url + '?client_id=96089e67110795b69a95705f38952d8f';
             } else {
-                this.soundcloud_id = this.dissociated_playlist[this.current_id].id;
-                var full_stream_url = this.dissociated_playlist[this.current_id].stream_url + '?client_id=96089e67110795b69a95705f38952d8f';
+                var song = this.dissociated_playlist[this.current_id];
+                this.soundcloud_id = song.id;
+                var full_stream_url = song.stream_url + '?client_id=96089e67110795b69a95705f38952d8f';
             }
             this.audio = new Audio(full_stream_url);
             this.audio.crossOrigin = "anonymous";
@@ -408,6 +416,7 @@
             });
             this.play();
             renderLibrary(fullLibrary);
+            document.getElementById('song-display').innerHTML = song.user.username + ' - '+song.title;
             clearVisualizer();
             visualizer(true);
         },
@@ -415,11 +424,13 @@
             this.pause();
             this._setIDs(this.prev_id);
             if (!this.is_dissociated) {
-                this.soundcloud_id = this.playlist[this.current_id].id;
-                var full_stream_url = this.playlist[this.current_id].stream_url + '?client_id=96089e67110795b69a95705f38952d8f';
+                var song = this.playlist[this.current_id];
+                this.soundcloud_id = song.id;
+                var full_stream_url = song.stream_url + '?client_id=96089e67110795b69a95705f38952d8f';
             } else {
-                this.soundcloud_id = this.dissociated_playlist[this.current_id].id;
-                var full_stream_url = this.dissociated_playlist[this.current_id].stream_url + '?client_id=96089e67110795b69a95705f38952d8f';
+                var song = this.dissociated_playlist[this.current_id];
+                this.soundcloud_id = song.id;
+                var full_stream_url = song.stream_url + '?client_id=96089e67110795b69a95705f38952d8f';
             }
             this.audio = new Audio(full_stream_url);
             this.audio.crossOrigin = "anonymous";
@@ -430,6 +441,7 @@
             });
             this.play();
             renderLibrary(fullLibrary);
+            document.getElementById('song-display').innerHTML = song.user.username + ' - '+song.title;
             clearVisualizer();
             visualizer(true);
         },
@@ -457,6 +469,7 @@
             });
             this.play();
             renderLibrary(fullLibrary);
+            document.getElementById('song-display').innerHTML = song.user.username + ' - '+song.title;
             clearVisualizer();
             visualizer(true);
         },
@@ -584,13 +597,11 @@
     });
 
     document.getElementById('change-user').addEventListener('click', function() {
-        $('#overlay, #overlay-back').fadeIn(500);
-        $('body').addClass('stop-scrolling');
+        document.getElementById('overlay').style.display = 'block';
+        document.getElementById('overlay-back').style.display = 'block';
+        document.body.className = 'stop-scrolling';
     });
-    document.getElementById('signin-submit').addEventListener('click', function() {
-        // $('#overlay, #overlay-back').fadeOut(500);
-        // $('body').removeClass('stop-scrolling');
-        // $('#user-select').html(username);        
+    document.getElementById('signin-submit').addEventListener('click', function() {      
         var username = document.getElementById('signin-field').value;
         authenticateUsername(username);
     })
@@ -603,7 +614,18 @@
 
     //-------------------------------------------------------------------------------------------------------------//
 
-
+     function fade(element) {
+        var op = 1;  // initial opacity
+        var timer = setInterval(function () {
+            if (op <= 0.1){
+                clearInterval(timer);
+                element.style.display = 'none';
+            }
+            element.style.opacity = op;
+            element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+            op -= op * 0.1;
+        }, 50);
+    }
 
     var clearVisualizer = function() {
         var svg = document.getElementsByTagName('svg')[0];
@@ -725,9 +747,10 @@
                     localStorage.setItem("soundcloud_user_name", data.permalink);
                     document.getElementById('user-menu').innerHTML = data.permalink;
                     if (songPlayer.audio) songPlayer.pause();
-                    $('#overlay, #overlay-back').fadeOut(500);
-                    $('body').removeClass('stop-scrolling');
-                    $('#user-select').html(data.permalink);
+                    document.getElementById('overlay').style.display = 'none';
+                    document.getElementById('overlay-back').style.display = 'none';
+                    document.body.className = '';
+                    document.getElementById('user-menu').innerHTML = data.permalink;
                     startLibrary();
                 })
                 .fail(function(data, status) {
@@ -736,8 +759,7 @@
                 });
         }
         //Kick off the site.
-    $(document).ready(function() {
-
+    $(document).ready(function(event) {
         var ua = navigator.userAgent.toLowerCase(); 
         if (ua.indexOf('safari') != -1) { 
           if (ua.indexOf('chrome') == -1) {
