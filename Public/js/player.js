@@ -637,7 +637,8 @@
     var visualizer = function(new_song) {
         if (new_song) {
             window.cancelAnimationFrame(songPlayer.animation_id);
-            songPlayer.audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+            //songPlayer.audioCtx = new(window.AudioContext || window.webkitAudioContext || AudioContext);
+            songPlayer.audioCtx = new AudioContext();
             songPlayer.audioSrc = songPlayer.audioCtx.createMediaElementSource(songPlayer.audio);
             songPlayer.analyser = songPlayer.audioCtx.createAnalyser();
 
