@@ -637,8 +637,7 @@
     var visualizer = function(new_song) {
         if (new_song) {
             window.cancelAnimationFrame(songPlayer.animation_id);
-            //songPlayer.audioCtx = new(window.AudioContext || window.webkitAudioContext || AudioContext);
-            songPlayer.audioCtx = new AudioContext();
+            songPlayer.audioCtx = new(window.AudioContext || window.webkitAudioContext || AudioContext);
             songPlayer.audioSrc = songPlayer.audioCtx.createMediaElementSource(songPlayer.audio);
             songPlayer.analyser = songPlayer.audioCtx.createAnalyser();
 
@@ -768,6 +767,11 @@
             document.getElementById('signin-field').style.display = 'none';
             document.getElementById('signin-submit').style.display = 'none';
           }
+        }
+        if (ua.indexOf('MSIE') > 0) {
+            document.getElementById('signin-label').innerHTML = "Hi there! It seems like you're using Internet Explorer to navigate the web! While this is all well and good, Internet Explorer actually doesn't support a part of WebAudioAPI that this site uses for its visualizer. As such you will not have the full experience of the site, and will likely encounter errors. Sorry for the inconvenience!";
+            document.getElementById('signin-field').style.display = 'none';
+            document.getElementById('signin-submit').style.display = 'none';      
         }
         var user_id = localStorage.getItem("soundcloud_user_id");
         var user_name = localStorage.getItem("soundcloud_user_name");
