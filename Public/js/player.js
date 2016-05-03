@@ -1,15 +1,4 @@
 (function() {
-
-    var LibraryBox = React.createClass({
-        render: function() {
-            return (
-                <div>
-        <SongList songs={this.props.songs}/>
-      </div>
-            );
-        }
-    });
-
     var SongList = React.createClass({
         getInitialState: function() {
             return ({
@@ -70,7 +59,6 @@
             var is_current_song = (this.props.soundcloud_id === this.props.song.id);
             var glyph = (is_current_song && !this.props.isPaused) ? "pause" : "play-circle";
             var glyph_class = "glyphicon glyphicon-" + glyph;
-            var currTime = "0:00"
             return (
                 <div>
                 <span className={glyph_class} onClick={this.playSong}></span>
@@ -209,8 +197,8 @@
                         title.indexOf('redo') > -1) {
                         isRemix = true;
                     }
-                    if (document.getElementById('remixes').checked && isRemix == true) returnLibrary.push(song);
-                    if (document.getElementById('originals').checked && isRemix == false) returnLibrary.push(song);
+                    if (document.getElementById('remixes').checked && isRemix === true) returnLibrary.push(song);
+                    if (document.getElementById('originals').checked && isRemix === false) returnLibrary.push(song);
                 }
             } else {
                 var isRemix = false;
@@ -223,8 +211,8 @@
                     title.indexOf('redo') > -1) {
                     isRemix = true;
                 }
-                if (document.getElementById('remixes').checked && isRemix == true) returnLibrary.push(song);
-                if (document.getElementById('originals').checked && isRemix == false) returnLibrary.push(song);
+                if (document.getElementById('remixes').checked && isRemix === true) returnLibrary.push(song);
+                if (document.getElementById('originals').checked && isRemix === false) returnLibrary.push(song);
             }
         });
         return returnLibrary;
@@ -454,18 +442,21 @@
             this.pause();
             this._setIDs(this.next_id);
             if (!this.is_dissociated) {
-                this.soundcloud_id = this.playlist[this.current_id].id;
-                var full_stream_url = this.playlist[this.current_id].stream_url + '?client_id=96089e67110795b69a95705f38952d8f';
+                var song = this.playlist[this.current_id];
+                this.soundcloud_id = song.id;
+                var full_stream_url = song.stream_url + '?client_id=96089e67110795b69a95705f38952d8f';
             } else {
-                this.soundcloud_id = this.dissociated_playlist[this.current_id].id;
-                var full_stream_url = this.dissociated_playlist[this.current_id].stream_url + '?client_id=96089e67110795b69a95705f38952d8f';
+                var song = this.dissociated_playlist[this.current_id];
+                this.soundcloud_id = song.id;
+                var full_stream_url = song.stream_url + '?client_id=96089e67110795b69a95705f38952d8f';
             }
             this.audio = new Audio(full_stream_url);
             this.audio.crossOrigin = "anonymous";
             this.audio.addEventListener('ended', this._addNextSongHandler.bind(this));
             this.audio.addEventListener('timeupdate', function(event) {
                 var timeInMinutes = songPlayer.millisToMinutesAndSeconds(this.currentTime * 1000)
-                document.getElementById('current-time-' + songPlayer.soundcloud_id).innerHTML = timeInMinutes;
+                var currentTime = document.getElementById('current-time-' + songPlayer.soundcloud_id);
+                if (currentTime) currentTime.innerHTML = timeInMinutes;
             });
             this.play();
             renderLibrary(fullLibrary);
@@ -614,19 +605,6 @@
 
     //-------------------------------------------------------------------------------------------------------------//
 
-     function fade(element) {
-        var op = 1;  // initial opacity
-        var timer = setInterval(function () {
-            if (op <= 0.1){
-                clearInterval(timer);
-                element.style.display = 'none';
-            }
-            element.style.opacity = op;
-            element.style.filter = 'alpha(opacity=' + op * 100 + ")";
-            op -= op * 0.1;
-        }, 50);
-    }
-
     var clearVisualizer = function() {
         var svg = document.getElementsByTagName('svg')[0];
         if (svg) svg.parentNode.removeChild(svg);
@@ -768,14 +746,6 @@
             document.getElementById('signin-submit').style.display = 'none';
           }
         }
-
-        if (navigator.appName == 'Microsoft Internet Explorer' ||  !!(navigator.userAgent.match(/Trident/) || navigator.userAgent.match(/rv 11/)) || $.browser.msie == 1)
-        {
-            document.getElementById('signin-label').innerHTML = "Hi there! It seems like you're using Internet Explorer to navigate the web! While this is all well and good, Internet Explorer actually doesn't support a part of WebAudioAPI that this site uses for its visualizer. As such you will not have the full experience of the site, and will likely encounter errors. Sorry for the inconvenience!";
-            document.getElementById('signin-field').style.display = 'none';
-            document.getElementById('signin-submit').style.display = 'none';   
-        }
-
         var user_id = localStorage.getItem("soundcloud_user_id");
         var user_name = localStorage.getItem("soundcloud_user_name");
         if (user_id && user_name) {
