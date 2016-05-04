@@ -25,7 +25,6 @@
         hr {
             border-color: rgba(66, 133, 244, 0.25);
         }
-        
         #player {
             position: fixed;
             background-color: #4285f4;
@@ -196,13 +195,22 @@
         #song-display {
             overflow: hidden;
         }
+        #signin-cancel-container {
+            overflow: auto;
+        }
+        #signin-cancel {
+            float: right;
+            opacity: 0.35;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <div id="overlay-back"></div>
-    <div id="overlay">
+    <div id="overlay"> 
         <span>
-			<div id="signin"> 
+			<div id="signin">
+                <div id="signin-cancel-container"><p id="signin-cancel" style=""> X </p></div>
 				<p id="signin-label">Enter Your Soundcloud Username or Profile Web Address: </p>
 				<input id="signin-field" type="text">
 				<p id="signin-submit"> Submit </p>
@@ -282,4 +290,5 @@
         <div class="col-md-1"></div>
     </div>
 </body>
-<script>
+<script src="js/player.js" type="text/babel"></script>
+</html>

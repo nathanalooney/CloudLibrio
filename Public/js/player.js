@@ -595,13 +595,18 @@
     document.getElementById('signin-submit').addEventListener('click', function() {      
         var username = document.getElementById('signin-field').value;
         authenticateUsername(username);
-    })
+    });
     document.getElementById('signin-field').addEventListener('keyup', function(event) {
         if (event.keyCode === 13) {
             var username = document.getElementById('signin-field').value;
             authenticateUsername(username);
         }
-    })
+    });
+    document.getElementById('signin-cancel').addEventListener('click', function(event) {
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('overlay-back').style.display = 'none';
+        document.body.className = '';     
+    });
 
     //-------------------------------------------------------------------------------------------------------------//
 
@@ -755,6 +760,7 @@
         } else {
             document.getElementById('overlay-back').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
+            document.body.className="stop-scrolling";
         }
     });
 })();
