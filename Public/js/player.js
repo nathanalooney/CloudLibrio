@@ -87,7 +87,7 @@
     }
 
     var loadLibrary = function() {
-        var client_id = 'client_id=96089e67110795b69a95705f38952d8f'
+        var client_id = 'client_id=2d533a3055a966c2e24ec9be7a4e4717'
         document.getElementById('main').innerHTML = '<p id="load-status"> Loading Your Full Library </p>';
         $.get('https://api.soundcloud.com/users/' + songPlayer.user_id + '/favorites?' + client_id + '&limit=200&linked_partitioning=1', function(response) {
             try {
@@ -343,7 +343,7 @@
             this.soundcloud_id = song.id;
             this.title = song.title;
             this.artist = song.user.username
-            var full_stream_url = this.playlist[song.playlist_id].stream_url + '?client_id=96089e67110795b69a95705f38952d8f';
+            var full_stream_url = this.playlist[song.playlist_id].stream_url + '?client_id=2d533a3055a966c2e24ec9be7a4e4717';
             this.audio = new Audio(full_stream_url);
             this.audio.crossOrigin = 'anonymous';
             this.audio.addEventListener('ended', this._addNextSongHandler.bind(this));
@@ -380,11 +380,11 @@
             if (!this.is_dissociated) {
                 var song = this.playlist[this.current_id];
                 this.soundcloud_id = song.id;
-                var full_stream_url = song.stream_url + '?client_id=96089e67110795b69a95705f38952d8f';
+                var full_stream_url = song.stream_url + '?client_id=2d533a3055a966c2e24ec9be7a4e4717';
             } else {
                 var song = this.dissociated_playlist[this.current_id];
                 this.soundcloud_id = song.id;
-                var full_stream_url = song.stream_url + '?client_id=96089e67110795b69a95705f38952d8f';
+                var full_stream_url = song.stream_url + '?client_id=2d533a3055a966c2e24ec9be7a4e4717';
             }
             this.audio = new Audio(full_stream_url);
             this.audio.crossOrigin = "anonymous";
@@ -406,11 +406,11 @@
             if (!this.is_dissociated) {
                 var song = this.playlist[this.current_id];
                 this.soundcloud_id = song.id;
-                var full_stream_url = song.stream_url + '?client_id=96089e67110795b69a95705f38952d8f';
+                var full_stream_url = song.stream_url + '?client_id=2d533a3055a966c2e24ec9be7a4e4717';
             } else {
                 var song = this.dissociated_playlist[this.current_id];
                 this.soundcloud_id = song.id;
-                var full_stream_url = song.stream_url + '?client_id=96089e67110795b69a95705f38952d8f';
+                var full_stream_url = song.stream_url + '?client_id=2d533a3055a966c2e24ec9be7a4e4717';
             }
             this.audio = new Audio(full_stream_url);
             this.audio.crossOrigin = "anonymous";
@@ -436,11 +436,11 @@
             if (!this.is_dissociated) {
                 var song = this.playlist[this.current_id];
                 this.soundcloud_id = song.id;
-                var full_stream_url = song.stream_url + '?client_id=96089e67110795b69a95705f38952d8f';
+                var full_stream_url = song.stream_url + '?client_id=2d533a3055a966c2e24ec9be7a4e4717';
             } else {
                 var song = this.dissociated_playlist[this.current_id];
                 this.soundcloud_id = song.id;
-                var full_stream_url = song.stream_url + '?client_id=96089e67110795b69a95705f38952d8f';
+                var full_stream_url = song.stream_url + '?client_id=2d533a3055a966c2e24ec9be7a4e4717';
             }
             this.audio = new Audio(full_stream_url);
             this.audio.crossOrigin = "anonymous";
@@ -704,7 +704,7 @@
     var authenticateUsername = function(userinput) {
             clearLocalData();
             if (songPlayer.audio) songPlayer.pause();
-            var url = (userinput.toLowerCase().indexOf('http') > -1) ? 'https://api.soundcloud.com/resolve?url=' + userinput.trim('') + '&client_id=96089e67110795b69a95705f38952d8f' : 'https://api.soundcloud.com/resolve?url=https://soundcloud.com/' + userinput.trim() + '&client_id=96089e67110795b69a95705f38952d8f';
+            var url = (userinput.toLowerCase().indexOf('http') > -1) ? 'https://api.soundcloud.com/resolve?url=' + userinput.trim('') + '&client_id=2d533a3055a966c2e24ec9be7a4e4717' : 'https://api.soundcloud.com/resolve?url=https://soundcloud.com/' + userinput.trim() + '&client_id=2d533a3055a966c2e24ec9be7a4e4717';
             $.get({
                     url: url,
                     dataType: 'json'
