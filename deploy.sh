@@ -13,6 +13,6 @@ sed -i '' -e '$a\' tmp/index.html
 echo '</script>' >> tmp/index.html
 echo '</html>' >> tmp/index.html
 echo 'Pushing to Amazon S3...'
-aws s3 cp tmp/index.html s3://soundcloud.library/ --acl public-read
+aws s3 cp tmp/index.html s3://cloudlibr.io/ --acl public-read
 echo 'Cleaning Up...'
 rm tmp/*
