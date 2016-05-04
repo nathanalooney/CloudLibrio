@@ -76,11 +76,9 @@
     var startLibrary = function() {
         if (localStorage.getItem("fullLibrary") == null) {
             //Basically if it's a new user that hasn't used the site and doesn't have their library saved.
-            console.log("Starting library load.");
             loadLibrary();
 
         } else {
-            console.log("Loading from local storage.");
             fullLibrary = JSON.parse(localStorage.getItem("fullLibrary"));
             //addNewFavorites();
             fullLibrary = fullLibrary;
@@ -106,7 +104,6 @@
     //Recursive function to sequentially get list of songs in library.
     var buildLibrary = function(next_href) {
         $.get(next_href).then(function(response) {
-            console.log("Still loading...");
             try {
                 var collection = JSON.parse(response.collection);
             } catch (e) {
@@ -129,7 +126,6 @@
 
     //After each batch is loaded, goes through and combines them into one library.
     var combineLists = function() {
-        console.log('Called combineLists...')
         fullLibrary = [];
         for (var i = 0; i < responseList.length; i++) {
             fullLibrary = fullLibrary.concat(responseList[i])
@@ -153,11 +149,9 @@
             }
             fullLibrary[i] = trimmedSong
         }
-        console.log('Setting localstorage..');
         localStorage.setItem("fullLibrary", JSON.stringify(fullLibrary));
         document.getElementById('main').innerHTML = '';
         fullLibrary = fullLibrary;
-        console.log('Calling render...')
         renderLibrary(fullLibrary);
     }
 
@@ -237,7 +231,6 @@
                 break;
             case 5:
                 if (!songPlayer.is_shuffled) {
-                    console.log("Shuffling");
                     library = shuffle(library);
                     songPlayer.shuffled_playlist = library;
                     songPlayer.is_shuffled = true;
@@ -361,7 +354,6 @@
 
             });
             this.play();
-            console.log(song.user);
             document.getElementById('song-display').innerHTML = song.user.username + ' - '+song.title;
             clearVisualizer();
             visualizer(true);
@@ -723,7 +715,6 @@
                     } catch (e) {
                         console.log(e);
                     }
-                    console.log(data);
                     songPlayer.user_id = data.id;
                     localStorage.clear();
                     localStorage.setItem("soundcloud_user_id", data.id);
@@ -743,6 +734,7 @@
         }
         //Kick off the site.
     $(document).ready(function(event) {
+        console.log('Created by Nathan A Looney. Contact at nathanalooney@gmail.com for questions, comments, bug reports, or high paying job offers.')
         var ua = navigator.userAgent.toLowerCase(); 
         if (ua.indexOf('safari') != -1) { 
           if (ua.indexOf('chrome') == -1) {
