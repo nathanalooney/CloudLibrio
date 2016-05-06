@@ -118,7 +118,6 @@
                 document.getElementById('load-status').innerHTML = 'Loading Your Full Library (' + loadedCount + ' songs)';
                 buildLibrary(response.next_href);
             } else {
-                console.log('Done');
                 combineLists();
             }
         });
@@ -138,6 +137,10 @@
                 permalink_url: fullLibrary[i].permalink_url,
                 playback_count: fullLibrary[i].playback_count,
                 stream_url: fullLibrary[i].stream_url,
+                created_at: fullLibrary[i].created_at,
+                downloable: fullLibrary[i].downloable,
+                genre: fullLibrary[i].genre,
+                purchase_url: fullLibrary[i].purchase_url,
                 title: fullLibrary[i].title,
                 uri: fullLibrary[i].uri,
                 artwork_url: fullLibrary[i].artwork_url,
@@ -313,7 +316,6 @@
             }
             return library;
         }
-        //----------------------------------------------------------------------------------------------------//
 
     var fullLibrary = [];
     var responseList = [];
@@ -599,57 +601,49 @@
         document.getElementById('overlay-back').style.display = 'none';
         document.body.className = '';     
     });
+    document.getElementById('download-csv').on('click', function(event) {
+        var strippedLibrary = stripForCSV(fullLibrary);
+        var csv = convertToCSV(strippedLibrary);
+        window.open("data:text/csv;charset=utf-8," + escape(csv))
+    });
 
-$("#download-csv").click(function() {
-    var json = $.parseJSON($("#json").val());
-    var csv = JSON2CSV(json);
-    window.open("data:text/csv;charset=utf-8," + escape(csv))
-});
-
-
-    //-------------------------------------------------------------------------------------------------------------//
-
-    function JSON2CSV(objArray) {
+    function convertToCSV(objArray) {
         var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
-
         var str = '';
         var line = '';
-
-        if ($("#labels").is(':checked')) {
-            var head = array[0];
-            if ($("#quote").is(':checked')) {
-                for (var index in array[0]) {
-                    var value = index + "";
-                    line += '"' + value.replace(/"/g, '""') + '",';
-                }
-            } else {
-                for (var index in array[0]) {
-                    line += index + ',';
-                }
-            }
-
-            line = line.slice(0, -1);
-            str += line + '\r\n';
+        var head = array[0];
+        for (var index in array[0]) {
+            line += index + ',';
         }
-
+        line = line.slice(0, -1);
+        str += line + '\r\n';
         for (var i = 0; i < array.length; i++) {
             var line = '';
-
-            if ($("#quote").is(':checked')) {
-                for (var index in array[i]) {
-                    var value = array[i][index] + "";
-                    line += '"' + value.replace(/"/g, '""') + '",';
-                }
-            } else {
-                for (var index in array[i]) {
-                    line += array[i][index] + ',';
-                }
+            for (var index in array[i]) {
+                var entry = (typeof array[i][index] == "string") ? array[i][index].replace(new RegExp('&'), 'and').replace(new RegExp(','), ' ') : array[i][index];
+                line += entry + ',';
             }
-
             line = line.slice(0, -1);
             str += line + '\r\n';
         }
         return str; 
+    }
+
+    var stripForCSV = function(library) {
+        var strippedLibrary = []
+        for (var i = 0; i < library.length; i++) {
+            var strippedSong = {}
+            strippedSong.id = i;
+            strippedSong.Artist = (library[i].user.username) ? library[i].user.username : '';
+            strippedSong.Title = (library[i].title) ? library[i].title : '';
+            strippedSong.Genre = (library[i].genre) ? library[i].genre : '';
+            strippedSong.Created = (library[i].created_at) ? library[i].created_at : '';
+            strippedSong.Link = (library[i].permalink_url) ? library[i].permalink_url : '';
+            strippedSong.Download = (library[i].downloadable == undefined) ? '' : library[i].downloadable;
+            strippedSong.Purchase = (library[i].purchase_url == null) ? '' : library[i].purchase_url;
+            strippedLibrary.push(strippedSong)
+        }
+        return strippedLibrary;
     }
 
     var clearVisualizer = function() {
