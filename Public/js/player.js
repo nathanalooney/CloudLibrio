@@ -777,7 +777,7 @@
         }
         //Kick off the site.
     $(document).ready(function(event) {
-        console.log('Created by Nathan A Looney. Contact at nathanalooney@gmail.com for questions, comments, bug reports, or high paying job offers.')
+        console.log('Created by Nathan Looney. Contact at cloudlibrio@gmail.com for questions, comments, bug reports, or high paying job offers.')
         var ua = navigator.userAgent.toLowerCase(); 
         if (ua.indexOf('safari') != -1) { 
           if (ua.indexOf('chrome') == -1) {
