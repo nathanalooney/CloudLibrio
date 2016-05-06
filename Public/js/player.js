@@ -611,7 +611,6 @@
         var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
         var str = '';
         var line = '';
-        var head = array[0];
         for (var index in array[0]) {
             line += index + ',';
         }
