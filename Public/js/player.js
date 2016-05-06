@@ -601,7 +601,7 @@
         document.getElementById('overlay-back').style.display = 'none';
         document.body.className = '';     
     });
-    document.getElementById('download-csv').on('click', function(event) {
+    document.getElementById('download-csv').addEventListener('click', function(event) {
         var strippedLibrary = stripForCSV(fullLibrary);
         var csv = convertToCSV(strippedLibrary);
         window.open("data:text/csv;charset=utf-8," + escape(csv))
