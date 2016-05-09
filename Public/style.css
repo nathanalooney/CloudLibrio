@@ -1,158 +1,158 @@
-        hr {
-            border-color: rgba(66, 133, 244, 0.25);
-        }
-        #player {
-            position: fixed;
-            background-color: #4285f4;
-            left: 0px;
-            bottom: 0px;
-            width: 100%;
-            color: #ffffff;
-        }
-        #main {
-            background-color: #ffffff;
-            height: 100%;
-            padding-top: 60px;
-        }
-        body {
-            font-family: 'Roboto', sans-serif;
-            width: 100%;
-            height: 100%;
-        }
-        #main .glyphicon {
-            color: #FF8732;
-        }
-        #main .glyphicon-play-circle {
-            font-size: 4em;
-            cursor: pointer;
-        }
-        #main .glyphicon-pause {
-            font-size: 4em;
-            cursor: pointer;
-        }
-        html {
-            width: 100%;
-            height: 100%;
-            background: url(ripple.gif) center center no-repeat;
-        }
-        .song-info-container {
-            display: inline-block;
-            padding-left: 20px;
-        }
-        .current-time {
-            display: inline-block;
-        }
-        .duration {
-            display: inline-block;
-            float: right;
-        } 
-        #overlay-back {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 110%;
-            height: 110%;
-            background: #000;
-            opacity: 0.6;
-            filter: alpha(opacity=60);
-            z-index: 5;
-            display: none;
-        }
-        #overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10;
-            display: none;
-            color: #ffffff;
-        }
-        .stop-scrolling {
-            height: 100%;
-            overflow: hidden;
-        }
-        #signin {
-            width: 500px;
-            height: 40px;
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            margin-left: -250px;
-            margin-top: -100px;
-            text-align: center;
-        }
-        #signin-field {
-            background: transparent;
-            padding-left: 10px;
-            border-radius: 5px;
-            border-right: none;
-            border-left: none;
-            text-align: center;
-        } 
-        #signin-label {
-            padding-right: 10px;
-        }
-        
-        #signin-submit {
-            display: block;
-            background: transparent;
-            border: none;
-            margin-top: 10px;
-            cursor: pointer;
-        }
-        .dropdown-sort {
-            background: transparent;
-            -webkit-box-shadow: 0 0px 0px rgba(0, 0, 0, 0);
-            box-shadow: 0 0px 0px rgba(0, 0, 0, 0);
-            border: none;
-            border-radius: 0px;
-        }
-        
-        .library-nav {
-            background: #4285f4;
-            color: #ffffff;
-            text-decoration-color: #ffffff;
-            border-radius: 0;
-            border: 0px;
-        }
-        .navbar .nav > li > a {
-            color: #fff;
-        }
-        .navbar-default .navbar-brand {
-            color: #fff;
-        }
-        .row {
-            margin-left: 0 !important;
-            margin-right: 0 !important;
-        }
-        li .filter-container {
-            color: black;
-            overflow: hidden;
-            margin-top: 5px;
-            margin-bottom: 5px;
-        }
-        li .filter-container .filter-label {
-            display: inline-block;
-            float: left;
-            margin-left: 20px;
-        }
-        li .filter-container .filter-checkbox {
-            display: inline-block;
-            float: right;
-            margin-right: 20px;
-        }
-        ul .dropdown-divider {
-            margin: 5px;
-        }
-        #song-display {
-            overflow: hidden;
-        }
-        #signin-cancel-container {
-            overflow: auto;
-        }
-        #signin-cancel {
-            float: right;
-            opacity: 0.35;
-            cursor: pointer;
-        }
+hr {
+    border-color: rgba(66, 133, 244, 0.25);
+}
+#player {
+    position: fixed;
+    background-color: #4285f4;
+    left: 0px;
+    bottom: 0px;
+    width: 100%;
+    color: #ffffff;
+}
+#main {
+    background-color: #ffffff;
+    height: 100%;
+    padding-top: 60px;
+}
+body {
+    font-family: 'Roboto', sans-serif;
+    width: 100%;
+    height: 100%;
+}
+#main .glyphicon {
+    color: #FF8732;
+}
+#main .glyphicon-play-circle {
+    font-size: 4em;
+    cursor: pointer;
+}
+#main .glyphicon-pause {
+    font-size: 4em;
+    cursor: pointer;
+}
+html {
+    width: 100%;
+    height: 100%;
+    background: url(ripple.gif) center center no-repeat;
+}
+.song-info-container {
+    display: inline-block;
+    padding-left: 20px;
+}
+.current-time {
+    display: inline-block;
+}
+.duration {
+    display: inline-block;
+    float: right;
+} 
+#overlay-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 110%;
+    height: 110%;
+    background: #000;
+    opacity: 0.6;
+    filter: alpha(opacity=60);
+    z-index: 5;
+    display: none;
+}
+#overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    display: none;
+    color: #ffffff;
+}
+.stop-scrolling {
+    height: 100%;
+    overflow: hidden;
+}
+#signin {
+    width: 500px;
+    height: 40px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -250px;
+    margin-top: -100px;
+    text-align: center;
+}
+#signin-field {
+    background: transparent;
+    padding-left: 10px;
+    border-radius: 5px;
+    border-right: none;
+    border-left: none;
+    text-align: center;
+} 
+#signin-label {
+    padding-right: 10px;
+}
+
+#signin-submit {
+    display: block;
+    background: transparent;
+    border: none;
+    margin-top: 10px;
+    cursor: pointer;
+}
+.dropdown-sort {
+    background: transparent;
+    -webkit-box-shadow: 0 0px 0px rgba(0, 0, 0, 0);
+    box-shadow: 0 0px 0px rgba(0, 0, 0, 0);
+    border: none;
+    border-radius: 0px;
+}
+
+.library-nav {
+    background: #4285f4;
+    color: #ffffff;
+    text-decoration-color: #ffffff;
+    border-radius: 0;
+    border: 0px;
+}
+.navbar .nav > li > a {
+    color: #fff;
+}
+.navbar-default .navbar-brand {
+    color: #fff;
+}
+.row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+li .filter-container {
+    color: black;
+    overflow: hidden;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+li .filter-container .filter-label {
+    display: inline-block;
+    float: left;
+    margin-left: 20px;
+}
+li .filter-container .filter-checkbox {
+    display: inline-block;
+    float: right;
+    margin-right: 20px;
+}
+ul .dropdown-divider {
+    margin: 5px;
+}
+#song-display {
+    overflow: hidden;
+}
+#signin-cancel-container {
+    overflow: auto;
+}
+#signin-cancel {
+    float: right;
+    opacity: 0.35;
+    cursor: pointer;
+}

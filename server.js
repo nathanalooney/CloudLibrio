@@ -9,7 +9,7 @@ app.set('port', (process.env.PORT || 3000));
 
 
 
-app.use(express.static(__dirname + '/Public', {
+app.use(express.static(__dirname + '/public', {
 	setHeaders: function(res, path, stat) {
 	  res.header("Access-Control-Allow-Origin", "*");
 	  res.header("Access-Control-Allow-Headers", "origin, x-requested-with, content-type, accept, accept-encoding, authorization, x-csrftoken, accept-language");
