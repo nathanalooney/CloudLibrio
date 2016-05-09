@@ -30,3 +30,14 @@ CloudLibr.io works by first loading all metadata for available songs from a user
 
 **Shuffle:**
 - Fully randomize your library's ordering after filters and search terms have been applied.
+
+ **Export**
+- Export your entire music library to CSV format.
+
+##Reception
+After sending my website to some close friends for refinement, I decided to post the website on reddit's r/electronicmusic subreddit in order to gauge reaction and to get input on how to better improve the project. [The post I made can be found here](https://www.reddit.com/r/electronicmusic/comments/4hsjss/hey_guys_i_built_a_website_that_takes_all_your/). I did not anticipate the positive reaction that the website would have, staying as the number one post in the subreddit for almost 2 days, becoming the #81 post within the community of all time. 
+
+My reddit post led to hundreds of positive responses, and numerous individuals contacted me in support of the website, with questions about my implementation, and offers to collaborate on future projects. [A collection of the responses I received in support of the website can be found here](http://imgur.com/a/6T0DM). The website also became the subject of posts made by some very popular electronic music websites such as YourEDM, [which called it "The SoundCloud Update that Should Have Been Made Years Ago"](http://www.youredm.com/2016/05/04/redditor-turns-soundcloud-virtual-itunes-library/). By the time it came to light that this use of SoundCloud's API violated their terms of service two days after launch, the website had gained over 15,000 users.
+
+##Project
+All of the core code for the project resides within the public/ directory within the project. Player.js encapsulates the entirety of the websites functionality, with index.html representing the basic structure of the app. Within index.html is a minified version of style.css. The top level holds a small express server in server.js used for testing purposes. The top level of the project also holds a deploy.sh script which compiles player.js using Babel, minifies the resulting javascript, appends it directly to index.html, and pushes the single html file to Amazon S3. This design choice to compile the entirety of the app into a single page was made largely for the fun of it and to minimize hosting costs.
