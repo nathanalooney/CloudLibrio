@@ -1,6 +1,7 @@
 #[CloudLibr.io](http://cloudlibr.io)
-**Lightweight application built using React.js which turns your SoundCloud Likes Playlist into a fully navigable, searchable, sortable, and randomizable music library.**
 ![alt tag](/readme_image.png)
+**Lightweight application built using React.js which turns your SoundCloud Likes Playlist into a fully navigable, searchable, sortable, and randomizable music library.**
+
 ##Motivation
 CloudLibrio is a small project that began when I decided it was too much effort to sort through my 2,000+ song Likes playlist on SoundCloud just to find music I was listening to not even a year ago. I initially began designing it using pure HTML/CSS/Javascript while bored and over the course of a few weeks built a website that's fairly close in functioning to how it appears today. 
 
