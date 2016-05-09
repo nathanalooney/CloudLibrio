@@ -17,3 +17,16 @@ CloudLibr.io works by first loading all metadata for available songs from a user
 
 **Sorting by:**
 - Date Added
+- Artist Name
+- Song Title
+- Play Count
+
+**Filter by:**
+- Originals
+- Remixes
+
+**Search:**
+- Search through all song titles and artist names to filter out results.
+
+**Shuffle:**
+- Fully randomize your library's ordering after filters and search terms have been applied.
