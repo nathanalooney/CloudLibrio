@@ -586,21 +586,21 @@
         document.getElementById('overlay-back').style.display = 'block';
         document.body.className = 'stop-scrolling';
     });
-    document.getElementById('signin-submit').addEventListener('click', function() {      
-        var username = document.getElementById('signin-field').value;
-        authenticateUsername(username);
-    });
-    document.getElementById('signin-field').addEventListener('keyup', function(event) {
-        if (event.keyCode === 13) {
-            var username = document.getElementById('signin-field').value;
-            authenticateUsername(username);
-        }
-    });
-    document.getElementById('signin-cancel').addEventListener('click', function(event) {
-        document.getElementById('overlay').style.display = 'none';
-        document.getElementById('overlay-back').style.display = 'none';
-        document.body.className = '';     
-    });
+    // document.getElementById('signin-submit').addEventListener('click', function() {      
+    //     var username = document.getElementById('signin-field').value;
+    //     authenticateUsername(username);
+    // });
+    // document.getElementById('signin-field').addEventListener('keyup', function(event) {
+    //     if (event.keyCode === 13) {
+    //         var username = document.getElementById('signin-field').value;
+    //         authenticateUsername(username);
+    //     }
+    // });
+    // document.getElementById('signin-cancel').addEventListener('click', function(event) {
+    //     document.getElementById('overlay').style.display = 'none';
+    //     document.getElementById('overlay-back').style.display = 'none';
+    //     document.body.className = '';     
+    // });
     document.getElementById('download-csv').addEventListener('click', function(event) {
         var strippedLibrary = stripForCSV(fullLibrary);
         var csv = convertToCSV(strippedLibrary);
@@ -779,24 +779,24 @@
     $(document).ready(function(event) {
         localStorage.clear();
         console.log('Created by Nathan Looney. Contact at cloudlibrio@gmail.com for questions, comments, bug reports, or high paying job offers.')
-        var ua = navigator.userAgent.toLowerCase(); 
-        if (ua.indexOf('safari') != -1) { 
-          if (ua.indexOf('chrome') == -1) {
-            document.getElementById('signin-label').innerHTML = "Hi there! It seems like you're using Safari to navigate the web! While this is all well and good, Safari actually doesn't play nicely with a key aspect of Soundcloud's API (Due, likely, to Soundcloud's dev team not understanding CORS restrictions perfectly), so sadly you must use another browser to access this site. Sorry for the inconvenience!";
-            document.getElementById('signin-field').style.display = 'none';
-            document.getElementById('signin-submit').style.display = 'none';
-          }
-        }
-        var user_id = localStorage.getItem("soundcloud_user_id");
-        var user_name = localStorage.getItem("soundcloud_user_name");
-        if (user_id && user_name) {
-            songPlayer.user_id = user_id;
-            document.getElementById('user-menu').innerHTML = user_name;
-            startLibrary();
-        } else {
+        // var ua = navigator.userAgent.toLowerCase(); 
+        // if (ua.indexOf('safari') != -1) { 
+        //   if (ua.indexOf('chrome') == -1) {
+        //     document.getElementById('signin-label').innerHTML = "Hi there! It seems like you're using Safari to navigate the web! While this is all well and good, Safari actually doesn't play nicely with a key aspect of Soundcloud's API (Due, likely, to Soundcloud's dev team not understanding CORS restrictions perfectly), so sadly you must use another browser to access this site. Sorry for the inconvenience!";
+        //     document.getElementById('signin-field').style.display = 'none';
+        //     document.getElementById('signin-submit').style.display = 'none';
+        //   }
+        // }
+        // var user_id = localStorage.getItem("soundcloud_user_id");
+        // var user_name = localStorage.getItem("soundcloud_user_name");
+        // if (user_id && user_name) {
+        //     songPlayer.user_id = user_id;
+        //     document.getElementById('user-menu').innerHTML = user_name;
+        //     startLibrary();
+        // } else {
             document.getElementById('overlay-back').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
             document.body.className="stop-scrolling";
-        }
+        // }
     });
 })();
