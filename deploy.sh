@@ -1,7 +1,7 @@
 #!/bin/bash
 rm tmp/*
 echo 'Compiling React JSX...'
-node_modules/.bin/babel --presets react Public/js/player.js -o tmp/player-compiled.js
+node_modules/.bin/babel --presets react Public/player.js -o tmp/player-compiled.js
 echo 'Minimizing Compiled Javascript...'
 node_modules/.bin/uglifyjs tmp/player-compiled.js -m -c -o tmp/player-minified.js
 rm tmp/player-compiled.js
@@ -16,6 +16,6 @@ sed -i '' -e '$a\' tmp/index.html
 echo '</script>' >> tmp/index.html
 echo '</html>' >> tmp/index.html
 echo 'Pushing to Amazon S3...'
-aws s3 cp tmp/index.html s3://cloudlibr.io/ --acl public-read
+aws s3 cp tmp/index.html s3://cloudlibr.io/bigwild.html --acl public-read
 echo 'Cleaning Up...'
 rm tmp/*
